@@ -29,7 +29,7 @@ The solution should prioritize maintainability, clarity, and correctness over ex
 
 ### Backend
 
-- Expose REST API endpoint(s) for calculator operations
+- Expose a REST API endpoint for calculator operations
 - Validate request payloads
 - Handle edge cases
 - Return JSON responses
@@ -44,7 +44,6 @@ The solution should prioritize maintainability, clarity, and correctness over ex
 - Consistent error handling model
 - Basic linting / static analysis
 - Clear and concise documentation including:
-- Documentation including:
   - Setup instructions
   - API usage
   - Design rationale
@@ -62,29 +61,19 @@ The solution should prioritize maintainability, clarity, and correctness over ex
 
 ## Dev & Tooling Requirements
 
-### Tooling Decisions
-
-#### Backend tooling
-
+### Backend tooling
 - Language: Go
 - HTTP API: Go standard library (`net/http`)
 - Testing: `testify`
 - Logging: structured logging (`log/slog`)
 - Linting: `golangci-lint`
 
-#### Frontend tooling
-
+### Frontend tooling
 - Language: TypeScript
 - Framework: React
 - Build tool: Vite (or equivalent)
 - Testing: minimal unit/component testing setup
 - Styling: simple approach (no heavy UI frameworks required)
-
-#### Versions
-
-- Go 1.24+
-- Node.js 22+
-- TypeScript 5+
 
 ## Developer Experience Requirements
 
@@ -92,24 +81,7 @@ The solution should prioritize maintainability, clarity, and correctness over ex
 - Support both local development and Docker-based development flows
 - Keep developer commands simple and discoverable
 
-### Expected Make Targets
-
-- `make backend.run`
-- `make frontend.run`
-- `make run` (runs both services locally, if implemented)
-- `make test`
-- `make lint`
-- `make coverage`
-- `make build`
-- `make docker.build`
-- `make up`
-- `make down`
-
-### Notes
-
-- `make up` should start the full stack using Docker Compose
-- `make down` should stop the Docker Compose stack
-- If `make run` is implemented, it may run both services locally via parallel processes; otherwise Docker Compose is the primary combined workflow
+- Provide a small set of common targets for run, test, lint, build, and Docker-based workflows.
 
 ## Containerization
 
@@ -132,7 +104,6 @@ The solution should prioritize maintainability, clarity, and correctness over ex
 ## CI (Continuous Integration)
 
 - Provide a basic CI workflow (e.g., GitHub Actions) that:
-  - Installs dependencies
   - Runs linters
   - Runs tests
   - Builds the project
@@ -235,11 +206,4 @@ These items are lower priority and should only be implemented if the core scope 
 
 ## Project Notes
 
-This project is intentionally small. The primary goal is to demonstrate strong engineering judgment:
-
-- Thoughtful scope control
-- Maintainable design
-- Clear trade-offs
-- Production-minded considerations (without overengineering)
-
-It is preferred to deliver a clean, well-tested, and well-documented core solution rather than a feature-rich but less maintainable one.
+This project intentionally favors a clean, well-tested, and well-documented core solution over feature expansion.

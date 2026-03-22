@@ -40,44 +40,6 @@ Only after that should optional polish or production-minded extras be added.
 
 ---
 
-## Priorities
-
-### P0 — Must Have
-
-- Core calculator operations:
-  - addition
-  - subtraction
-  - multiplication
-  - division
-- Single REST endpoint
-- Frontend form for calculation input and result display
-- Backend validation and error handling
-- Frontend validation and user-friendly errors
-- Unit tests for critical backend logic
-- Basic frontend tests for key behavior
-- README with setup, usage, and design rationale
-- OpenAPI contract
-
-### P1 — Should Have
-
-- Structured logging
-- Makefile
-- Dockerfiles for frontend and backend
-- Docker Compose for full-stack local run
-- Basic linting setup
-- Basic GitHub Actions CI workflow
-- Basic responsive UI polish
-
-### P2 — Nice to Have
-
-- Optional calculator operations
-- Observability extensions such as OpenTelemetry + Jaeger
-- Coverage target helpers
-- Extra Make targets
-- Additional DX polish
-
----
-
 ## Implementation Phases
 
 ## Phase 0 — Specification Alignment
@@ -213,20 +175,6 @@ Make the project easy for a reviewer to understand and evaluate.
 
 ---
 
-## Suggested Timeboxes
-
-These are approximate and should be adjusted dynamically.
-
-| Time Block | Focus |
-|---|---|
-| 20–30 min | Specification and structure |
-| 60–90 min | Backend core |
-| 45–75 min | Frontend core |
-| 30–45 min | Tests, README, cleanup |
-| Remaining | Docker, Makefile, CI, polish |
-
----
-
 ## De-scope Rules
 
 If constraints require de-scoping, reduce scope in this order:
@@ -276,16 +224,3 @@ The project is considered done when:
 - the API contract is documented
 - the README is sufficient for evaluation
 - the project can be run locally with clear commands
-
----
-
-## Submission Mindset
-
-The target is not to build the most feature-rich calculator.
-
-The target is to submit a small system that communicates:
-- sound prioritization
-- maintainable design
-- pragmatic engineering judgment
-- awareness of production concerns
-- disciplined execution under constraint

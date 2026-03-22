@@ -37,47 +37,18 @@ Rationale:
 
 ### 3. Use a minimal REST API with a single endpoint
 
-The API will expose a single endpoint:
-
-`POST /api/v1/calculations`
-
-### API resource naming
-
-The API uses `/calculations` instead of `/calculate` to follow a more resource-oriented REST design.
-
-This leaves room for future extensions such as:
-- calculation history
-- retrieval endpoints
-- batch operations
+The API will expose a single endpoint, `POST /api/v1/calculations`.
 
 Rationale:
 - Keeps API surface small
 - Avoids duplication across multiple endpoints
 - Simplifies frontend integration
-- Provides a cleaner REST-oriented resource model
 
 ---
 
 ### 4. Use a stable JSON response model
 
-All responses follow consistent shapes.
-
-Success:
-```json
-{
-  "result": 42
-}
-```
-
-Error:
-```json
-{
-  "error": {
-    "code": "INVALID_REQUEST",
-    "message": "request body is invalid"
-  }
-}
-```
+All responses follow consistent success and error shapes defined by the API contract.
 
 Rationale:
 - Simplifies client handling

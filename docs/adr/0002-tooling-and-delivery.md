@@ -24,11 +24,6 @@ Rationale:
 
 ### 2. Use lightweight tooling for quality gates
 
-Selected tools:
-- `testify` for backend testing
-- `golangci-lint` for linting
-- basic frontend testing setup
-
 Rationale:
 - Improves code quality
 - Avoids heavy setup
@@ -94,12 +89,6 @@ Rationale:
 - demonstrates awareness of production practices without overengineering
 - aligns with a focused implementation while still signaling maturity
 
-Future considerations:
-- OpenTelemetry instrumentation
-- Jaeger for local tracing
-- Prometheus metrics
-- Datadog integration
-
 ## Consequences
 
 ### Positive
@@ -115,4 +104,4 @@ Future considerations:
 
 ## Notes
 
-Advanced observability (OpenTelemetry, Jaeger, Prometheus, Datadog) is intentionally deferred as a future enhancement. For the initial submission, JSON structured logging provides a lightweight operational baseline that is compatible with common centralized logging platforms.
+Structured JSON logging provides a lightweight operational baseline without expanding the initial scope.

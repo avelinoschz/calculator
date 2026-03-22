@@ -29,13 +29,9 @@ Priorities (in order):
 
 ## Core Requirements
 
-- Support 4 operations: add, subtract, multiply, divide
-- Single endpoint: `POST /api/v1/calculations`
-- Frontend UI for input and result display
-- Validation on frontend and backend
-- Consistent JSON error model
-- Unit tests for critical logic
-- README with setup and rationale
+- Follow `specs/calculator/requirements.md` for scope and acceptance criteria.
+- Follow `api/openapi.yaml` for the canonical API contract.
+- Keep the implementation aligned with the documented constraints and priorities.
 
 ## Non-Goals
 
@@ -103,27 +99,6 @@ Avoid implementing:
   - local execution
   - Docker Compose execution
 
-## Docker Rules
-
-### Backend container
-
-- Use multi-stage Docker build
-- Final image should be minimal
-
-### System
-
-- Docker Compose runs frontend + backend
-
-## CI Rules
-
-- Provide a minimal GitHub Actions workflow
-- Should run:
-  - lint
-  - tests
-  - build
-
-Do not implement full CD pipelines.
-
 ## Coding Guidelines
 
 - Prefer clarity over cleverness
@@ -147,18 +122,6 @@ Never:
 - introduce new frameworks without strong justification
 - add features outside defined scope
 - overengineer the solution
-
-## Definition of Done
-
-The implementation is complete when:
-
-- All 4 operations work end-to-end
-- API contract is respected
-- Validation and error handling are correct
-- Tests pass
-- Code is readable and maintainable
-- README explains setup and usage
-- Project can be run locally or via Docker Compose
 
 ## Iteration Strategy
 
@@ -186,10 +149,7 @@ Over:
 
 - complex and incomplete
 
-If constraints require de-scoping:
-
-- finish core features
-- skip optional enhancements
+If constraints require de-scoping, preserve core features and skip optional enhancements first.
 
 ## Final Reminder
 

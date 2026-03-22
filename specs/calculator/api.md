@@ -116,7 +116,8 @@ All API errors return a consistent JSON structure.
 
 ## Error Codes
 
-The exact set of error codes may evolve slightly during implementation, but the response shape should remain stable.
+The exact set of error codes should remain small and predictable.
+Refer to `api/openapi.yaml` for the canonical response contract.
 
 | Error Code | Meaning |
 |---|---|
@@ -243,18 +244,4 @@ A single calculations endpoint keeps the API small and avoids unnecessary duplic
 A stable error model simplifies frontend integration and improves maintainability.
 
 ### Why binary operands only?
-The initial required scope only includes binary operations.
-This keeps the contract simpler and avoids premature complexity for optional unary operations like square root.
-
----
-
-## Non-Goals for This Contract
-
-The API contract does not currently include:
-- authentication
-- version negotiation beyond the URL prefix
-- operation history
-- batch calculations
-- advanced observability metadata in responses
-
-These can be considered future enhancements if the project scope expands.
+The required scope only includes binary operations, which keeps the contract simple and focused.
