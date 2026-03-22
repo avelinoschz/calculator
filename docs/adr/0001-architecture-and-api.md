@@ -5,7 +5,7 @@ Accepted
 
 ## Context
 
-This project is a small, time-constrained take-home assessment. The goal is to demonstrate strong engineering judgment, prioritizing simplicity, maintainability, and correctness over feature breadth or architectural complexity.
+This project is a small calculator system. The goal is to prioritize simplicity, maintainability, and correctness over feature breadth or architectural complexity.
 
 ## Decisions
 
@@ -124,4 +124,4 @@ Rationale:
 
 ## Notes
 
-This design intentionally favors simplicity over extensibility, given the time constraint and evaluation context.
+This design intentionally favors simplicity over extensibility, given the project's current scope.

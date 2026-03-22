@@ -2,9 +2,9 @@
 
 ## Overview
 
-This document describes the execution plan for the take-home calculator project.
+This document describes the execution plan for the calculator project.
 
-Its purpose is to translate requirements and design decisions into a realistic delivery strategy under a 2–4 hour time constraint.
+Its purpose is to translate requirements and design decisions into a realistic delivery strategy.
 
 This plan derives from `specs/calculator/requirements.md`.
 The API contract described here should be validated against `api/openapi.yaml`.
@@ -191,10 +191,10 @@ Make the project easy to run, test, lint, and review.
 
 ---
 
-## Phase 4 — Documentation and Submission Polish
+## Phase 4 — Documentation and Delivery Polish
 
 ### Goal
-Make the submission easy for a reviewer to understand and evaluate.
+Make the project easy for a reviewer to understand and evaluate.
 
 ### Tasks
 - Write or refine README
@@ -229,7 +229,7 @@ These are approximate and should be adjusted dynamically.
 
 ## De-scope Rules
 
-If time becomes tight, reduce scope in this order:
+If constraints require de-scoping, reduce scope in this order:
 
 1. Skip optional calculator operations
 2. Skip advanced observability
@@ -254,7 +254,7 @@ Do not sacrifice:
 - Overengineering project structure
 - Adding optional features too early
 - Losing time in frontend polish beyond what is needed
-- Expanding Docker/CI/observability beyond the assignment value
+- Expanding Docker/CI/observability beyond the project's needs
 
 ### Mitigations
 - Build backend core first

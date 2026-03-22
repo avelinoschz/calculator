@@ -15,7 +15,7 @@ The system consists of:
 
 ## Primary Objective
 
-Deliver a clean, maintainable, and well-structured solution within a time constraint.
+Deliver a clean, maintainable, and well-structured solution with clear priorities.
 
 Priorities (in order):
 
@@ -186,14 +186,14 @@ Over:
 
 - complex and incomplete
 
-If time is limited:
+If constraints require de-scoping:
 
 - finish core features
 - skip optional enhancements
 
 ## Final Reminder
 
-This project is an evaluation of engineering judgment.
+This project values strong engineering judgment.
 
 The best solution is not the most complex one, but the one that is:
 

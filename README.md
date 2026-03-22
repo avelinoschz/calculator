@@ -7,14 +7,14 @@ Simple full-stack calculator system built with:
 
 ## Overview
 
-This repository contains the specification, API contract, and design decisions for a small full-stack calculator take-home assessment.
+This repository contains the specification, API contract, and design decisions for a small full-stack calculator project.
 
 The intended implementation is designed with a focus on:
 
 - maintainability
 - clarity
 - correctness
-- engineering judgment under time constraints
+- thoughtful engineering judgment
 
 Rather than maximizing features, the goal is to deliver a clean, well-structured, and production-minded solution.
 

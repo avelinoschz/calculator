@@ -5,7 +5,7 @@ Accepted
 
 ## Context
 
-The project must demonstrate production-minded engineering practices while remaining lightweight and achievable within a short time constraint.
+The project should demonstrate production-minded engineering practices while remaining lightweight and focused.
 
 ## Decisions
 
@@ -82,7 +82,7 @@ Rationale:
 
 ### 7. Treat observability as a production-minded consideration (not a core dependency)
 
-Advanced observability is valuable, but should not displace core implementation quality in a short take-home.
+Advanced observability is valuable, but should not displace core implementation quality in a small project.
 
 Current approach:
 - structured logging is in scope
@@ -92,7 +92,7 @@ Current approach:
 Rationale:
 - keeps implementation focused on core functionality
 - demonstrates awareness of production practices without overengineering
-- aligns with time constraints while still signaling maturity
+- aligns with a focused implementation while still signaling maturity
 
 Future considerations:
 - OpenTelemetry instrumentation

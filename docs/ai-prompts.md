@@ -55,7 +55,7 @@ Only propose the project structure and explain the reasoning behind it.
 
 ## 2. Reviewer Prompt
 
-Use this prompt after a meaningful implementation step, such as backend core, frontend core, or pre-submission review.
+Use this prompt after a meaningful implementation step, such as backend core, frontend core, or a final review pass.
 
 ```text
 Act as a strict and pragmatic code reviewer.
@@ -87,7 +87,7 @@ Return the review in this format:
 2. Medium issues
 3. Low-priority improvements
 4. Items that should be de-scoped
-5. Final assessment of code quality and maintainability
+5. Final review of code quality and maintainability
 ```
 
 ## Notes
