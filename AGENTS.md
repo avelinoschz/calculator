@@ -87,7 +87,14 @@ Avoid implementing:
 
 ### Frontend testing
 
-- Test critical user flows:
+- Use `vitest` as the test runner
+- Use `React Testing Library` for component rendering and interaction
+- Use `@testing-library/user-event` for realistic user interaction simulation
+- Test across three layers:
+  - API layer (`src/api/`) — plain TypeScript, mock `fetch` with `vi.stubGlobal`
+  - Component layer (`src/components/`) — render in isolation, no network calls
+  - Integration (`App`) — full component tree with mocked fetch, assert on visible output
+- Cover critical user flows:
   - valid submission
   - validation errors
   - API error handling
