@@ -89,6 +89,15 @@ calculator operations.
 - Tests pass
 - Backend can be run locally
 
+### Phase 1 Deliverables
+
+- Go backend with domain logic separated from HTTP handlers
+- `GET /health` and `POST /api/v1/calculations` endpoints
+- Request validation and consistent JSON error responses
+- Structured logging with `log/slog`
+- Graceful shutdown on `SIGINT` / `SIGTERM`
+- Unit tests for domain logic and HTTP handlers
+
 ## Phase 2 — Frontend Core
 
 ### Phase 2 Goal
@@ -113,6 +122,16 @@ Build a minimal but clear UI that consumes the backend API.
 - Invalid input is surfaced clearly
 - Backend errors are surfaced clearly
 - Frontend can be run locally
+
+### Phase 2 Deliverables
+
+- React + TypeScript frontend scaffolded with Vite
+- Calculator form with operand inputs, operation selector, and client-side validation
+- API layer isolated from UI components; dev proxy to backend
+- Result and error state displayed clearly
+- Responsive layout with plain CSS
+- Unit and integration tests across API layer, component layer, and full app
+- Frontend Dockerfile (build + serve)
 
 ## Phase 3 — Developer Experience and Quality Gates
 

@@ -76,9 +76,9 @@ engineering practices.
 
 - Language: TypeScript
 - Framework: React
-- Build tool: Vite (or equivalent)
-- Testing: minimal unit/component testing setup
-- Styling: simple approach (no heavy UI frameworks required)
+- Build tool: Vite
+- Testing: `vitest`, `React Testing Library`, `@testing-library/user-event`
+- Styling: plain CSS (no UI framework)
 
 ## Developer Experience Requirements
 

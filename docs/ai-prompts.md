@@ -30,7 +30,15 @@ flow, and review process.
 
 ## 1. Initial Structure Prompt
 
-Use this prompt before generating implementation code.
+Used this prompt at the start of the project to propose an initial
+full-stack structure before implementation began.
+
+Its purpose was to translate the requirements, ADRs, and delivery plan
+into a simple project layout that favored maintainability over
+abstraction.
+
+In practice, it mostly informed the Phase 1 backend structure because
+the implementation was intentionally sequenced backend-first.
 
 ```text
 Read the following files:
@@ -57,7 +65,74 @@ Do not generate implementation code yet.
 Only propose the project structure and explain the reasoning behind it.
 ```
 
-## 2. Reviewer Prompt
+## 2. Frontend Implementation Prompt
+
+Used this prompt to implement the frontend phase after the backend API
+contract and core handlers were already in place.
+
+Its purpose was to keep the frontend work aligned with the documented
+project priorities: simple structure, clear separation between UI and
+API code, client-side validation, and compatibility with the existing
+backend contract.
+
+This prompt was most useful once the backend endpoints, request shape,
+and implementation boundaries were already stable.
+
+```text
+This is a full-stack calculator project. The repository is at /github.com/avelinoschz/calculator.
+
+Phase 1 (Go backend) is complete. Read the following files before doing anything:
+
+AGENTS.md — implementation rules and priorities
+specs/calculator/requirements.md — scope and acceptance criteria
+specs/calculator/plan.md — phased delivery plan
+specs/calculator/api.md — human-readable API contract
+api/openapi.yaml — canonical API contract
+What is already built
+
+
+backend/
+  cmd/server/main.go                          ← entry point, graceful shutdown
+  internal/calculator/calculator.go           ← domain logic, sentinel errors
+  internal/calculator/calculator_test.go      ← 19 table-driven tests
+  internal/handler/handler.go                 ← HTTP handler
+  internal/handler/handler_test.go            ← 9 handler tests
+  internal/handler/models.go                  ← request/response structs
+  go.mod / go.sum
+The backend runs on :8080. Two endpoints: GET /health and POST /api/v1/calculations. The request field for the operation is op (not operation).
+
+Your task
+
+Implement Phase 2 — Frontend Core — as described in specs/calculator/plan.md.
+
+The agreed project structure for the frontend is:
+
+
+frontend/
+  src/
+    api/
+      calculator.ts       ← fetch client, isolated from UI
+    components/
+      CalculatorForm.tsx  ← inputs, operation selector, submit
+    App.tsx               ← root, holds result/error state
+    main.tsx
+  index.html
+  package.json
+  tsconfig.json
+  vite.config.ts
+  Dockerfile
+Key constraints from AGENTS.md:
+
+React + TypeScript, Vite build tool
+No heavy UI frameworks, no complex state management
+Separate API calls from UI logic (src/api/ must not bleed into components)
+Client-side validation before submitting
+Display result and error states clearly
+Basic responsive layout for mobile
+Start by reading the spec files listed above, then plan before implementing.
+```
+
+## 3. Reviewer Prompt
 
 Use this prompt after a meaningful implementation step, such as backend
 core, frontend core, or a final review pass.
