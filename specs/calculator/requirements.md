@@ -58,7 +58,7 @@ The solution should prioritize maintainability, clarity, and correctness over ex
 
 ### Proposed API Shape
 
-- `POST /api/v1/calculate`
+- `POST /api/v1/calculations`
 
 ## Dev & Tooling Requirements
 

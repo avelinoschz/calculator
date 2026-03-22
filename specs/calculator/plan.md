@@ -110,7 +110,7 @@ Build the smallest correct backend that supports the required calculator operati
 - Create Go module and backend project structure
 - Implement calculator domain logic separate from HTTP handlers
 - Define request and response models
-- Implement `POST /api/v1/calculate`
+- Implement `POST /api/v1/calculations`
 - Add request validation
 - Add consistent JSON error responses
 - Add structured logging with `log/slog`

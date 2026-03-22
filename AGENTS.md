@@ -30,7 +30,7 @@ Priorities (in order):
 ## Core Requirements
 
 - Support 4 operations: add, subtract, multiply, divide
-- Single endpoint: `POST /api/v1/calculate`
+- Single endpoint: `POST /api/v1/calculations`
 - Frontend UI for input and result display
 - Validation on frontend and backend
 - Consistent JSON error model
