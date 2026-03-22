@@ -7,14 +7,16 @@ Simple full-stack calculator system built with:
 
 ## Overview
 
-This project is a small full-stack calculator designed with a focus on:
+This repository contains the specification, API contract, and design decisions for a small full-stack calculator take-home assessment.
+
+The intended implementation is designed with a focus on:
 
 - maintainability
 - clarity
 - correctness
 - engineering judgment under time constraints
 
-Rather than maximizing features, the goal was to deliver a clean, well-structured, and production-minded solution.
+Rather than maximizing features, the goal is to deliver a clean, well-structured, and production-minded solution.
 
 ## Document Guide
 
@@ -27,7 +29,7 @@ Rather than maximizing features, the goal was to deliver a clean, well-structure
 
 ## AI-Assisted Development
 
-This project was developed using AI-assisted workflows for:
+This repository is being prepared using AI-assisted workflows for:
 
 - specification and planning
 - implementation guidance
@@ -39,7 +41,7 @@ Representative prompts used during development can be found in:
 
 - `docs/ai-prompts.md`
 
-## Features
+## Target Features
 
 - Addition
 - Subtraction
@@ -50,6 +52,8 @@ Representative prompts used during development can be found in:
 
 - `POST /api/v1/calculations`
 
+This endpoint is defined as part of the current project specification.
+
 See:
 
 - `specs/calculator/api.md`
@@ -57,7 +61,9 @@ See:
 
 ## How to Run
 
-Instructions will be provided via:
+Setup and run instructions will be completed alongside the implementation.
+
+They are expected to be provided via:
 
 - Makefile targets
 - Docker Compose
@@ -71,4 +77,4 @@ Key design decisions are documented in:
 
 ## Notes
 
-This project intentionally prioritizes simplicity and completeness over feature expansion, as a reflection of real-world pragmatic engineering decisions and simplicity.
+This repository intentionally prioritizes clear scope, maintainable design, and pragmatic decision-making before implementation begins.
