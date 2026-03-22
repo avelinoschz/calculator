@@ -33,13 +33,13 @@ paths:
               addition:
                 summary: Addition example
                 value:
-                  operation: add
+                  op: add
                   a: 10
                   b: 5
               division:
                 summary: Division example
                 value:
-                  operation: divide
+                  op: divide
                   a: 20
                   b: 4
       responses:
@@ -101,11 +101,11 @@ components:
       type: object
       additionalProperties: false
       required:
-        - operation
+        - op
         - a
         - b
       properties:
-        operation:
+        op:
           type: string
           description: Calculator operation to execute
           enum:

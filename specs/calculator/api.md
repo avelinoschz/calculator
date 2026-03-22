@@ -34,7 +34,7 @@ Executes a calculator operation using two numeric operands.
 
 ```json
 {
-  "operation": "add",
+  "op": "add",
   "a": 10,
   "b": 5
 }
@@ -44,7 +44,7 @@ Executes a calculator operation using two numeric operands.
 
 | Field       | Type     | Required | Description          |
 | ----------- | -------- | -------- | -------------------- |
-| `operation` | `string` | Yes      | Operation to execute |
+| `op`        | `string` | Yes      | Operation to execute |
 | `a`         | `number` | Yes      | First operand        |
 | `b`         | `number` | Yes      | Second operand       |
 
@@ -122,7 +122,7 @@ The set of error codes should remain small and predictable. Refer to
 ### Request Validation
 
 - Request body must be valid JSON
-- `operation` must be one of:
+- `op` must be one of:
   - `add`
   - `subtract`
   - `multiply`
@@ -142,7 +142,7 @@ The set of error codes should remain small and predictable. Refer to
 
 ```json
 {
-  "operation": "add",
+  "op": "add",
   "a": 10,
   "b": 5
 }
@@ -162,7 +162,7 @@ The set of error codes should remain small and predictable. Refer to
 
 ```json
 {
-  "operation": "divide",
+  "op": "divide",
   "a": 20,
   "b": 4
 }
@@ -182,7 +182,7 @@ The set of error codes should remain small and predictable. Refer to
 
 ```json
 {
-  "operation": "power",
+  "op": "power",
   "a": 2,
   "b": 3
 }
@@ -205,7 +205,7 @@ The set of error codes should remain small and predictable. Refer to
 
 ```json
 {
-  "operation": "divide",
+  "op": "divide",
   "a": 10,
   "b": 0
 }

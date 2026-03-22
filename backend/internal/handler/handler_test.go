@@ -23,37 +23,37 @@ func TestCalculateHandler(t *testing.T) {
 	}{
 		{
 			name:       "add two numbers",
-			body:       `{"operation":"add","a":10,"b":5}`,
+			body:       `{"op":"add","a":10,"b":5}`,
 			wantStatus: http.StatusOK,
 			wantResult: ptr(15.0),
 		},
 		{
 			name:       "subtract two numbers",
-			body:       `{"operation":"subtract","a":10,"b":3}`,
+			body:       `{"op":"subtract","a":10,"b":3}`,
 			wantStatus: http.StatusOK,
 			wantResult: ptr(7.0),
 		},
 		{
 			name:       "multiply two numbers",
-			body:       `{"operation":"multiply","a":4,"b":5}`,
+			body:       `{"op":"multiply","a":4,"b":5}`,
 			wantStatus: http.StatusOK,
 			wantResult: ptr(20.0),
 		},
 		{
 			name:       "divide two numbers",
-			body:       `{"operation":"divide","a":20,"b":4}`,
+			body:       `{"op":"divide","a":20,"b":4}`,
 			wantStatus: http.StatusOK,
 			wantResult: ptr(5.0),
 		},
 		{
 			name:          "division by zero",
-			body:          `{"operation":"divide","a":10,"b":0}`,
+			body:          `{"op":"divide","a":10,"b":0}`,
 			wantStatus:    http.StatusUnprocessableEntity,
 			wantErrorCode: handler.ErrCodeDivisionByZero,
 		},
 		{
 			name:          "invalid operation",
-			body:          `{"operation":"power","a":2,"b":3}`,
+			body:          `{"op":"power","a":2,"b":3}`,
 			wantStatus:    http.StatusBadRequest,
 			wantErrorCode: handler.ErrCodeInvalidOperation,
 		},

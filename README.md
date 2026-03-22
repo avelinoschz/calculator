@@ -87,7 +87,7 @@ Run a calculation:
 ```sh
 curl -s -X POST http://localhost:8080/api/v1/calculations \
   -H "Content-Type: application/json" \
-  -d '{"operation":"add","a":10,"b":5}'
+  -d '{"op":"add","a":10,"b":5}'
 # {"result":15}
 ```
 

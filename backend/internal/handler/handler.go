@@ -25,7 +25,7 @@ func Calculate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.Operation == "" {
-		writeError(w, http.StatusBadRequest, ErrCodeMissingField, "operation is required")
+		writeError(w, http.StatusBadRequest, ErrCodeMissingField, "op is required")
 		return
 	}
 
