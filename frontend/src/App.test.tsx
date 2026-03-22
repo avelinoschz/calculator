@@ -6,6 +6,7 @@ import App from './App'
 function mockFetch(status: number, body: unknown) {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
     ok: status >= 200 && status < 300,
+    headers: { get: () => 'application/json' },
     json: () => Promise.resolve(body),
   }))
 }

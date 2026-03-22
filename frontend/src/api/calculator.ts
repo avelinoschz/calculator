@@ -15,16 +15,28 @@ export interface ApiError {
   message: string
 }
 
+const SERVER_UNAVAILABLE = 'Unable to reach the server. Make sure the backend is running.'
+
 export async function calculate(req: CalculateRequest): Promise<CalculateResponse> {
-  const response = await fetch('/api/v1/calculations', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(req),
-  })
+  let response: Response
+
+  try {
+    response = await fetch('/api/v1/calculations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req),
+    })
+  } catch {
+    throw new Error(SERVER_UNAVAILABLE)
+  }
 
   if (!response.ok) {
-    const body = await response.json() as { error: ApiError }
-    throw new Error(body.error.message)
+    const contentType = response.headers.get('content-type')
+    if (contentType?.includes('application/json')) {
+      const body = await response.json() as { error: ApiError }
+      throw new Error(body.error.message)
+    }
+    throw new Error(SERVER_UNAVAILABLE)
   }
 
   return response.json() as Promise<CalculateResponse>

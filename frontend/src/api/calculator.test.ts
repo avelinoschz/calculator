@@ -8,6 +8,7 @@ afterEach(() => {
 function mockFetch(status: number, body: unknown) {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
     ok: status >= 200 && status < 300,
+    headers: { get: () => 'application/json' },
     json: () => Promise.resolve(body),
   }))
 }
@@ -22,6 +23,7 @@ describe('calculate', () => {
   it('sends correct request body', async () => {
     const fetchSpy = vi.fn().mockResolvedValue({
       ok: true,
+      headers: { get: () => 'application/json' },
       json: () => Promise.resolve({ result: 6 }),
     })
     vi.stubGlobal('fetch', fetchSpy)
@@ -43,5 +45,18 @@ describe('calculate', () => {
   it('throws with backend message on 400 response', async () => {
     mockFetch(400, { error: { code: 'INVALID_OPERATION', message: 'operation must be one of add, subtract, multiply, divide' } })
     await expect(calculate({ op: 'add', a: 1, b: 2 })).rejects.toThrow('operation must be one of add, subtract, multiply, divide')
+  })
+
+  it('throws a user-friendly message when the server is unreachable', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
+    await expect(calculate({ op: 'add', a: 1, b: 2 })).rejects.toThrow('Unable to reach the server. Make sure the backend is running.')
+  })
+
+  it('throws a user-friendly message when the proxy returns a non-JSON error response', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: false,
+      headers: { get: () => null },
+    }))
+    await expect(calculate({ op: 'add', a: 1, b: 2 })).rejects.toThrow('Unable to reach the server. Make sure the backend is running.')
   })
 })
