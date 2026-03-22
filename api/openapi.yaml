@@ -15,8 +15,35 @@ servers:
 tags:
   - name: Calculator
     description: Calculator operations
+  - name: Infrastructure
+    description: Health and liveness checks
 
 paths:
+  /health:
+    get:
+      tags:
+        - Infrastructure
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required:
+                  - status
+                properties:
+                  status:
+                    type: string
+                    example: ok
+              examples:
+                healthy:
+                  value:
+                    status: ok
+
   /api/v1/calculations:
     post:
       tags:

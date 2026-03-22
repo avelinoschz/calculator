@@ -6,7 +6,7 @@ The backend exposes a minimal REST API for calculator operations.
 
 The contract is intentionally small:
 
-- one endpoint
+- two endpoints (calculator + health check)
 - one request shape
 - one success shape
 - one error shape
@@ -18,7 +18,20 @@ This document is a human-readable guide to the API. The canonical
 machine-readable contract lives in `api/openapi.yaml`. If there is any
 discrepancy, `api/openapi.yaml` prevails.
 
-## Endpoint
+## Endpoints
+
+### `GET /health`
+
+Returns the liveness status of the server.
+
+#### Health Response
+
+```json
+{"status": "ok"}
+```
+
+Always returns `200 OK` while the server is running. No request body or
+parameters required.
 
 ### `POST /api/v1/calculations`
 
@@ -78,6 +91,11 @@ Executes a calculator operation using two numeric operands.
 ## Error Response
 
 All API errors return a consistent JSON structure.
+
+Errors in the domain layer (`calculator` package) are defined as sentinel
+errors (`ErrInvalidOperation`, `ErrDivisionByZero`). The HTTP handler maps
+them to the appropriate status code and error body using `errors.Is`, keeping
+domain logic decoupled from transport concerns.
 
 ### Error Body
 

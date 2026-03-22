@@ -91,6 +91,18 @@ Rationale:
 - Demonstrates awareness of production practices without overengineering
 - Aligns with a focused implementation while still signaling maturity
 
+### 8. Implement graceful shutdown
+
+The server handles `SIGINT` and `SIGTERM` signals. On receipt, it calls
+`http.Server.Shutdown` with a 10-second context timeout. In-flight requests
+are allowed to complete; new connections are rejected immediately.
+
+Rationale:
+
+- Prevents abrupt connection drops during restarts or container stops
+- Aligns with production expectations without adding complexity
+- Required for correct behaviour in Docker and orchestrated environments
+
 ## Consequences
 
 ### Positive

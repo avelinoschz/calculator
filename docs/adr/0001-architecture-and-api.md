@@ -38,9 +38,12 @@ Rationale:
 - Reduces coupling
 - Keeps logic easy to reason about
 
-### 3. Use a minimal REST API with a single endpoint
+### 3. Use a minimal REST API
 
-The API will expose a single endpoint, `POST /api/v1/calculations`.
+The API exposes two endpoints:
+
+- `POST /api/v1/calculations` — core calculator operation
+- `GET /health` — liveness check for local and container environments
 
 Rationale:
 
@@ -71,6 +74,23 @@ Backend:
 
 - Source of truth
 - Guarantees correctness
+
+### 7. Use sentinel errors for domain errors
+
+The domain layer (`internal/calculator`) defines errors as exported
+package-level variables:
+
+- `ErrInvalidOperation`
+- `ErrDivisionByZero`
+
+The HTTP handler maps them to status codes using `errors.Is`, keeping the
+transport layer decoupled from domain internals.
+
+Rationale:
+
+- Errors are explicit and discoverable
+- `errors.Is` enables safe wrapping without coupling layers
+- Domain logic remains testable without HTTP context
 
 ### 6. Use Go standard library for HTTP
 
