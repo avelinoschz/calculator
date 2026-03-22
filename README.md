@@ -43,7 +43,7 @@ Representative prompts used during development can be found in:
 
 See:
 
-- `specs/calculator/api-contract.md`
+- `specs/calculator/api.md`
 - `api/openapi.yaml`
 
 ## How to Run

@@ -68,7 +68,7 @@ Avoid implementing:
 ## API Rules
 
 - Follow the contract defined in:
-  - `docs/04-api-contract.md`
+  - `specs/calculator/api.md`
   - `api/openapi.yaml`
 
 - Do not introduce additional endpoints unless strictly necessary

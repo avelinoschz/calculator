@@ -85,11 +85,11 @@ Ensure requirements, design decisions, and API contract are clear before impleme
 
 ### Deliverables
 
-- `docs/01-requirements.md`
-- `docs/03-decisions.md`
-- `docs/04-api-contract.md`
+- `specs/calculator/requirements.md`
+- `docs/adr/0001-architecture-and-api.md`
+- `specs/calculator/api.md`
 - `api/openapi.yaml`
-- `docs/02-plan.md`
+- `specs/calculator/plan.md`
 
 ### Exit Criteria
 

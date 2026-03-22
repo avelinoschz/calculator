@@ -33,7 +33,7 @@ Read the following files:
 - AGENTS.md
 - specs/calculator/requirements.md
 - specs/calculator/plan.md
-- specs/calculator/api-contract.md
+- specs/calculator/api.md
 - api/openapi.yaml
 - docs/adr/0001-architecture-and-api.md
 - docs/adr/0002-tooling-and-delivery.md
@@ -65,7 +65,7 @@ Read the following files first:
 - AGENTS.md
 - specs/calculator/requirements.md
 - specs/calculator/plan.md
-- specs/calculator/api-contract.md
+- specs/calculator/api.md
 - api/openapi.yaml
 - docs/adr/0001-architecture-and-api.md
 - docs/adr/0002-tooling-and-delivery.md
