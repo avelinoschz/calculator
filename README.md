@@ -7,7 +7,8 @@ Simple full-stack calculator system built with:
 
 ## Overview
 
-This repository contains the specification, API contract, and design decisions for a small full-stack calculator project.
+This repository contains the specification, API contract, and design
+decisions for a small full-stack calculator project.
 
 The intended implementation is designed with a focus on:
 
@@ -16,15 +17,19 @@ The intended implementation is designed with a focus on:
 - correctness
 - thoughtful engineering judgment
 
-Rather than maximizing features, the goal is to deliver a clean, well-structured, and production-minded solution.
+Rather than maximizing features, the goal is to deliver a clean,
+well-structured, and production-minded solution.
 
 ## Document Guide
 
-- `specs/calculator/requirements.md` is the source of truth for scope and acceptance criteria.
+- `specs/calculator/requirements.md` is the source of truth for scope
+  and acceptance criteria.
 - `specs/calculator/plan.md` describes the intended implementation sequence.
 - `specs/calculator/api.md` is the human-readable API guide.
 - `api/openapi.yaml` is the canonical API contract.
-- `docs/adr/0001-architecture-and-api.md` and `docs/adr/0002-tooling-and-delivery.md` capture architectural decisions and trade-offs.
+- `docs/adr/0001-architecture-and-api.md` and
+  `docs/adr/0002-tooling-and-delivery.md` capture architectural
+  decisions and trade-offs.
 - `AGENTS.md` provides implementation guidance for AI-assisted workflows.
 
 ## AI-Assisted Development
@@ -77,4 +82,5 @@ Key design decisions are documented in:
 
 ## Notes
 
-This repository intentionally prioritizes clear scope, maintainable design, and pragmatic decision-making before implementation begins.
+This repository intentionally prioritizes clear scope, maintainable
+design, and pragmatic decision-making before implementation begins.

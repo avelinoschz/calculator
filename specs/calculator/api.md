@@ -5,16 +5,18 @@
 The backend exposes a minimal REST API for calculator operations.
 
 The contract is intentionally small:
+
 - one endpoint
 - one request shape
 - one success shape
 - one error shape
 
-This keeps the API easy to implement, test, and consume from the frontend.
+This keeps the API easy to implement, test, and consume from the
+frontend.
 
-This document is a human-readable guide to the API.
-The canonical machine-readable contract lives in `api/openapi.yaml`.
-If there is any discrepancy, `api/openapi.yaml` prevails.
+This document is a human-readable guide to the API. The canonical
+machine-readable contract lives in `api/openapi.yaml`. If there is any
+discrepancy, `api/openapi.yaml` prevails.
 
 ---
 
@@ -29,6 +31,7 @@ Executes a calculator operation using two numeric operands.
 ## Request
 
 ### Content-Type
+
 `application/json`
 
 ### Request Body
@@ -41,13 +44,13 @@ Executes a calculator operation using two numeric operands.
 }
 ```
 
-### Fields
+### Request Fields
 
-| Field | Type | Required | Description |
-|---|---|---:|---|
-| `operation` | `string` | Yes | Operation to execute |
-| `a` | `number` | Yes | First operand |
-| `b` | `number` | Yes | Second operand |
+| Field       | Type     | Required | Description          |
+| ----------- | -------- | -------- | -------------------- |
+| `operation` | `string` | Yes      | Operation to execute |
+| `a`         | `number` | Yes      | First operand        |
+| `b`         | `number` | Yes      | Second operand       |
 
 ### Allowed Operations
 
@@ -60,10 +63,11 @@ Executes a calculator operation using two numeric operands.
 
 ## Success Response
 
-### Status
+### Success Status
+
 `200 OK`
 
-### Body
+### Success Body
 
 ```json
 {
@@ -71,10 +75,10 @@ Executes a calculator operation using two numeric operands.
 }
 ```
 
-### Fields
+### Success Fields
 
-| Field | Type | Description |
-|---|---|---|
+| Field    | Type     | Description     |
+| -------- | -------- | --------------- |
 | `result` | `number` | Computed result |
 
 ---
@@ -83,7 +87,7 @@ Executes a calculator operation using two numeric operands.
 
 All API errors return a consistent JSON structure.
 
-### Body
+### Error Body
 
 ```json
 {
@@ -94,45 +98,43 @@ All API errors return a consistent JSON structure.
 }
 ```
 
-### Fields
+### Error Fields
 
-| Field | Type | Description |
-|---|---|---|
-| `error.code` | `string` | Machine-readable error code |
-| `error.message` | `string` | Human-readable error message |
+- `error.code` (`string`): machine-readable error code
+- `error.message` (`string`): human-readable error message
 
 ---
 
 ## Status Codes
 
-| Status Code | Meaning |
-|---|---|
-| `200 OK` | Successful calculation |
-| `400 Bad Request` | Invalid payload, malformed JSON, missing fields, or invalid operation |
-| `422 Unprocessable Entity` | Mathematically invalid request, such as division by zero |
-| `500 Internal Server Error` | Unexpected server-side error |
+- `200 OK`: successful calculation
+- `400 Bad Request`: invalid payload, malformed JSON, missing fields,
+  or invalid operation
+- `422 Unprocessable Entity`: mathematically invalid request, such as
+  division by zero
+- `500 Internal Server Error`: unexpected server-side error
 
 ---
 
 ## Error Codes
 
-The set of error codes should remain small and predictable.
-Refer to `api/openapi.yaml` for the canonical response contract.
+The set of error codes should remain small and predictable. Refer to
+`api/openapi.yaml` for the canonical response contract.
 
-| Error Code | Meaning |
-|---|---|
-| `INVALID_REQUEST` | Request body could not be parsed or failed basic validation |
-| `INVALID_OPERATION` | Operation is not supported |
-| `MISSING_FIELD` | A required field is missing |
-| `INVALID_NUMBER` | One or more operands are invalid |
-| `DIVISION_BY_ZERO` | Division by zero is not allowed |
-| `INTERNAL_ERROR` | Unexpected internal server error |
+- `INVALID_REQUEST`: request body could not be parsed or failed basic
+  validation
+- `INVALID_OPERATION`: operation is not supported
+- `MISSING_FIELD`: a required field is missing
+- `INVALID_NUMBER`: one or more operands are invalid
+- `DIVISION_BY_ZERO`: division by zero is not allowed
+- `INTERNAL_ERROR`: unexpected internal server error
 
 ---
 
 ## Validation Rules
 
 ### Request Validation
+
 - Request body must be valid JSON
 - `operation` must be one of:
   - `add`
@@ -143,6 +145,7 @@ Refer to `api/openapi.yaml` for the canonical response contract.
 - `b` must be a valid number
 
 ### Business Validation
+
 - `divide` must reject `b = 0`
 
 ---
@@ -151,7 +154,8 @@ Refer to `api/openapi.yaml` for the canonical response contract.
 
 ### Addition
 
-#### Request
+#### Addition Request
+
 ```json
 {
   "operation": "add",
@@ -160,7 +164,8 @@ Refer to `api/openapi.yaml` for the canonical response contract.
 }
 ```
 
-#### Response
+#### Addition Response
+
 ```json
 {
   "result": 15
@@ -171,7 +176,8 @@ Refer to `api/openapi.yaml` for the canonical response contract.
 
 ### Division
 
-#### Request
+#### Division Request
+
 ```json
 {
   "operation": "divide",
@@ -180,7 +186,8 @@ Refer to `api/openapi.yaml` for the canonical response contract.
 }
 ```
 
-#### Response
+#### Division Response
+
 ```json
 {
   "result": 5
@@ -191,7 +198,8 @@ Refer to `api/openapi.yaml` for the canonical response contract.
 
 ### Invalid Operation
 
-#### Request
+#### Invalid Operation Request
+
 ```json
 {
   "operation": "power",
@@ -200,7 +208,8 @@ Refer to `api/openapi.yaml` for the canonical response contract.
 }
 ```
 
-#### Response
+#### Invalid Operation Response
+
 ```json
 {
   "error": {
@@ -214,7 +223,8 @@ Refer to `api/openapi.yaml` for the canonical response contract.
 
 ### Division by Zero
 
-#### Request
+#### Division by Zero Request
+
 ```json
 {
   "operation": "divide",
@@ -223,7 +233,8 @@ Refer to `api/openapi.yaml` for the canonical response contract.
 }
 ```
 
-#### Response
+#### Division by Zero Response
+
 ```json
 {
   "error": {
@@ -238,10 +249,16 @@ Refer to `api/openapi.yaml` for the canonical response contract.
 ## Contract Design Notes
 
 ### Why a single endpoint?
-A single calculations endpoint keeps the API small and avoids unnecessary duplication across multiple operation-specific routes.
+
+A single calculations endpoint keeps the API small and avoids
+unnecessary duplication across multiple operation-specific routes.
 
 ### Why a consistent error shape?
-A stable error model simplifies frontend integration and improves maintainability.
+
+A stable error model simplifies frontend integration and improves
+maintainability.
 
 ### Why binary operands only?
-The required scope only includes binary operations, which keeps the contract simple and focused.
+
+The required scope only includes binary operations, which keeps the
+contract simple and focused.

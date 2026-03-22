@@ -5,7 +5,8 @@
 
 This repository contains a small full-stack calculator application.
 
-The goal is to demonstrate strong engineering judgment, with maintainability in mind rather than feature volume.
+The goal is to demonstrate strong engineering judgment, with
+maintainability in mind rather than feature volume.
 
 The system consists of:
 
@@ -149,7 +150,8 @@ Over:
 
 - complex and incomplete
 
-If constraints require de-scoping, preserve core features and skip optional enhancements first.
+If constraints require de-scoping, preserve core features and skip
+optional enhancements first.
 
 ## Final Reminder
 

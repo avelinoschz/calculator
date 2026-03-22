@@ -1,6 +1,7 @@
 # AI Usage Summary
 
-This project was developed using an AI-assisted workflow to improve productivity, structure, and code quality.
+This project was developed using an AI-assisted workflow to improve
+productivity, structure, and code quality.
 
 AI was used as a collaborative assistant for:
 
@@ -12,15 +13,20 @@ AI was used as a collaborative assistant for:
 - reviewing the implementation from a senior-level code review perspective
 - drafting and improving documentation
 
-All AI-generated or AI-assisted outputs were manually reviewed, validated, and adjusted before inclusion.
+All AI-generated or AI-assisted outputs were manually reviewed,
+validated, and adjusted before inclusion.
 
-The goal was not to rely blindly on AI, but to use it as a tool to accelerate iteration while maintaining full ownership of design decisions and code quality.
+The goal was not to rely blindly on AI, but to use it as a tool to
+accelerate iteration while maintaining full ownership of design
+decisions and code quality.
 
 ## AI Prompts
 
 This document captures a small set of representative prompts used during development.
 
-The goal is not to document every single prompt, but to preserve the most useful prompts that shaped the project structure, implementation flow, and review process.
+The goal is not to document every single prompt, but to preserve the
+most useful prompts that shaped the project structure, implementation
+flow, and review process.
 
 ---
 
@@ -55,7 +61,8 @@ Only propose the project structure and explain the reasoning behind it.
 
 ## 2. Reviewer Prompt
 
-Use this prompt after a meaningful implementation step, such as backend core, frontend core, or a final review pass.
+Use this prompt after a meaningful implementation step, such as backend
+core, frontend core, or a final review pass.
 
 ```text
 Act as a strict and pragmatic code reviewer.

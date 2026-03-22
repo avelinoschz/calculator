@@ -4,7 +4,9 @@
 
 Build a small full-stack calculator application with a React frontend and a Go backend.
 
-The solution should prioritize maintainability, clarity, and correctness over extra features, while demonstrating production-minded engineering practices.
+The solution should prioritize maintainability, clarity, and
+correctness over extra features, while demonstrating production-minded
+engineering practices.
 
 ## In Scope
 
@@ -53,7 +55,8 @@ The solution should prioritize maintainability, clarity, and correctness over ex
 - Define the calculator API contract explicitly
 - Provide a minimal OpenAPI specification
 - Keep the API surface small and easy to understand
-- Prefer a single calculation endpoint over multiple operation-specific endpoints unless there is a strong reason not to
+- Prefer a single calculation endpoint over multiple operation-specific
+  endpoints unless there is a strong reason not to
 
 ### Proposed API Shape
 
@@ -62,6 +65,7 @@ The solution should prioritize maintainability, clarity, and correctness over ex
 ## Dev & Tooling Requirements
 
 ### Backend tooling
+
 - Language: Go
 - HTTP API: Go standard library (`net/http`)
 - Testing: `testify`
@@ -69,6 +73,7 @@ The solution should prioritize maintainability, clarity, and correctness over ex
 - Linting: `golangci-lint`
 
 ### Frontend tooling
+
 - Language: TypeScript
 - Framework: React
 - Build tool: Vite (or equivalent)
@@ -80,7 +85,8 @@ The solution should prioritize maintainability, clarity, and correctness over ex
 - Provide a `Makefile` with common development commands
 - Support both local development and Docker-based development flows
 - Keep developer commands simple and discoverable
-- Provide a small set of common targets for run, test, lint, build, and Docker-based workflows.
+- Provide a small set of common targets for run, test, lint, build,
+  and Docker-based workflows.
 
 ## Containerization
 
@@ -111,7 +117,8 @@ Note: Full CD (deployment) is not required.
 
 ## Optional Scope
 
-These items are lower priority and should only be implemented if the core scope is complete:
+These items are lower priority and should only be implemented if the
+core scope is complete:
 
 - Exponentiation
 - Square root
@@ -205,4 +212,5 @@ These items are lower priority and should only be implemented if the core scope 
 
 ## Project Notes
 
-This project intentionally favors a clean, well-tested, and well-documented core solution over feature expansion.
+This project intentionally favors a clean, well-tested, and
+well-documented core solution over feature expansion.
