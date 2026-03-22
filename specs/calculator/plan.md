@@ -6,6 +6,9 @@ This document describes the execution plan for the take-home calculator project.
 
 Its purpose is to translate requirements and design decisions into a realistic delivery strategy under a 2–4 hour time constraint.
 
+This plan derives from `specs/calculator/requirements.md`.
+The API contract described here should be validated against `api/openapi.yaml`.
+
 The plan prioritizes:
 
 - core completeness

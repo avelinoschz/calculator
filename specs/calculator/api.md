@@ -12,7 +12,9 @@ The contract is intentionally small:
 
 This keeps the API easy to implement, test, and consume from the frontend.
 
-The formal machine-readable contract lives in `api/openapi.yaml`.
+This document is a human-readable guide to the API.
+The canonical machine-readable contract lives in `api/openapi.yaml`.
+If there is any discrepancy, `api/openapi.yaml` prevails.
 
 ---
 

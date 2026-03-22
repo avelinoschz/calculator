@@ -16,6 +16,15 @@ This project is a small full-stack calculator designed with a focus on:
 
 Rather than maximizing features, the goal was to deliver a clean, well-structured, and production-minded solution.
 
+## Document Guide
+
+- `specs/calculator/requirements.md` is the source of truth for scope and acceptance criteria.
+- `specs/calculator/plan.md` describes the intended implementation sequence.
+- `specs/calculator/api.md` is the human-readable API guide.
+- `api/openapi.yaml` is the canonical API contract.
+- `docs/adr/0001-architecture-and-api.md` and `docs/adr/0002-tooling-and-delivery.md` capture architectural decisions and trade-offs.
+- `AGENTS.md` provides implementation guidance for AI-assisted workflows.
+
 ## AI-Assisted Development
 
 This project was developed using AI-assisted workflows for:

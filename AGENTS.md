@@ -67,9 +67,9 @@ Avoid implementing:
 
 ## API Rules
 
-- Follow the contract defined in:
-  - `specs/calculator/api.md`
-  - `api/openapi.yaml`
+- Use `specs/calculator/requirements.md` as the source of truth for scope.
+- Use `api/openapi.yaml` as the source of truth for the API contract.
+- Use `specs/calculator/api.md` as the human-readable companion to the API contract.
 
 - Do not introduce additional endpoints unless strictly necessary
 - Keep request/response shapes stable
