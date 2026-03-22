@@ -156,7 +156,7 @@ Make the project easy to run, test, lint, and review.
 ## Phase 4 — Documentation and Delivery Polish
 
 ### Goal
-Make the project easy for a reviewer to understand and evaluate.
+Make the project easy to understand and review.
 
 ### Tasks
 - Write or refine README
@@ -222,5 +222,5 @@ The project is considered done when:
 - the code is readable and reasonably structured
 - unit tests cover key functionality
 - the API contract is documented
-- the README is sufficient for evaluation
+- the README is sufficient for setup and usage
 - the project can be run locally with clear commands

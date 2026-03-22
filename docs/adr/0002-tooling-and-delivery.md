@@ -47,8 +47,8 @@ Rationale:
 The project will include a Makefile with common commands.
 
 Goals:
-- simplify workflows
-- standardize commands
+- Simplify workflows
+- Standardize commands
 
 ---
 
@@ -80,14 +80,14 @@ Rationale:
 Advanced observability is valuable, but should not displace core implementation quality in a small project.
 
 Current approach:
-- structured logging is in scope
-- logs are emitted in JSON format for compatibility with aggregation systems
-- advanced tracing and metrics are optional
+- Structured logging is in scope
+- Logs are emitted in JSON format for compatibility with aggregation systems
+- Advanced tracing and metrics are optional
 
 Rationale:
-- keeps implementation focused on core functionality
-- demonstrates awareness of production practices without overengineering
-- aligns with a focused implementation while still signaling maturity
+- Keeps implementation focused on core functionality
+- Demonstrates awareness of production practices without overengineering
+- Aligns with a focused implementation while still signaling maturity
 
 ## Consequences
 

@@ -63,11 +63,11 @@ Validation responsibilities:
 
 Frontend:
 - UX improvements
-- early feedback
+- Early feedback
 
 Backend:
-- source of truth
-- guarantees correctness
+- Source of truth
+- Guarantees correctness
 
 ---
 

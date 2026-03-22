@@ -5,7 +5,7 @@
 
 This repository contains a small full-stack calculator application.
 
-The goal is to demonstrate strong engineering judgment, with mantainability in mind, not feature volume.
+The goal is to demonstrate strong engineering judgment, with maintainability in mind rather than feature volume.
 
 The system consists of:
 
@@ -111,17 +111,17 @@ Avoid implementing:
 
 Always:
 
-- follow existing file structure
-- respect separation of concerns
-- match existing naming conventions
-- keep implementations simple
-- include validation where required
+- Follow existing file structure
+- Respect separation of concerns
+- Match existing naming conventions
+- Keep implementations simple
+- Include validation where required
 
 Never:
 
-- introduce new frameworks without strong justification
-- add features outside defined scope
-- overengineer the solution
+- Introduce new frameworks without strong justification
+- Add features outside the defined scope
+- Overengineer the solution
 
 ## Iteration Strategy
 

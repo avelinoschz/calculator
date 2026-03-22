@@ -18,7 +18,7 @@ The goal was not to rely blindly on AI, but to use it as a tool to accelerate it
 
 ## AI Prompts
 
-This document captures a small set of representative prompts used during used during development.
+This document captures a small set of representative prompts used during development.
 
 The goal is not to document every single prompt, but to preserve the most useful prompts that shaped the project structure, implementation flow, and review process.
 

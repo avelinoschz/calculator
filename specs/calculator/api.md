@@ -116,7 +116,7 @@ All API errors return a consistent JSON structure.
 
 ## Error Codes
 
-The exact set of error codes should remain small and predictable.
+The set of error codes should remain small and predictable.
 Refer to `api/openapi.yaml` for the canonical response contract.
 
 | Error Code | Meaning |

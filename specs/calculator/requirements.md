@@ -80,7 +80,6 @@ The solution should prioritize maintainability, clarity, and correctness over ex
 - Provide a `Makefile` with common development commands
 - Support both local development and Docker-based development flows
 - Keep developer commands simple and discoverable
-
 - Provide a small set of common targets for run, test, lint, build, and Docker-based workflows.
 
 ## Containerization
@@ -159,7 +158,7 @@ These items are lower priority and should only be implemented if the core scope 
 - Tests cover the most important behavior
 - Logging provides useful debugging context
 - Linting passes without critical issues
-- The README explains how to run and evaluate the project
+- The README explains setup and usage
 - Common developer workflows are executable through the Makefile
 - The API contract is documented in OpenAPI format
 - The full stack can be started with Docker Compose
