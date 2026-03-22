@@ -66,12 +66,32 @@ See:
 
 ## How to Run
 
-Setup and run instructions will be completed alongside the implementation.
+### Backend
 
-They are expected to be provided via:
+```sh
+cd backend
+go run ./cmd/server/
+```
 
-- Makefile targets
-- Docker Compose
+The server starts on `http://localhost:8080`.
+
+Check the server is up:
+
+```sh
+curl http://localhost:8080/health
+# {"status":"ok"}
+```
+
+Run a calculation:
+
+```sh
+curl -s -X POST http://localhost:8080/api/v1/calculations \
+  -H "Content-Type: application/json" \
+  -d '{"operation":"add","a":10,"b":5}'
+# {"result":15}
+```
+
+Makefile targets and Docker Compose support will be added in a later phase.
 
 ## Design
 
