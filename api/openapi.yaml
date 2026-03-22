@@ -1,0 +1,159 @@
+openapi: 3.0.3
+info:
+  title: Calculator API
+  version: 1.0.0
+  description: |
+    Minimal REST API for calculator operations.
+
+    This API is intentionally small and designed for a take-home assessment
+    with maintainability and clarity as primary goals.
+
+servers:
+  - url: http://localhost:8080
+    description: Local backend server
+
+tags:
+  - name: Calculator
+    description: Calculator operations
+
+paths:
+  /api/v1/calculations:
+    post:
+      tags:
+        - Calculator
+      summary: Create a calculation
+      operationId: createCalculation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculateRequest'
+            examples:
+              addition:
+                summary: Addition example
+                value:
+                  operation: add
+                  a: 10
+                  b: 5
+              division:
+                summary: Division example
+                value:
+                  operation: divide
+                  a: 20
+                  b: 4
+      responses:
+        '200':
+          description: Successful calculation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculateResponse'
+              examples:
+                success:
+                  value:
+                    result: 15
+        '400':
+          description: Invalid request payload or invalid operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidOperation:
+                  value:
+                    error:
+                      code: INVALID_OPERATION
+                      message: operation must be one of add, subtract, multiply, divide
+                malformedRequest:
+                  value:
+                    error:
+                      code: INVALID_REQUEST
+                      message: request body is invalid
+        '422':
+          description: Valid request format but invalid mathematical operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                divisionByZero:
+                  value:
+                    error:
+                      code: DIVISION_BY_ZERO
+                      message: division by zero is not allowed
+        '500':
+          description: Unexpected server-side error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalError:
+                  value:
+                    error:
+                      code: INTERNAL_ERROR
+                      message: an unexpected error occurred
+
+components:
+  schemas:
+    CalculateRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - operation
+        - a
+        - b
+      properties:
+        operation:
+          type: string
+          description: Calculator operation to execute
+          enum:
+            - add
+            - subtract
+            - multiply
+            - divide
+        a:
+          type: number
+          format: double
+          description: First operand
+        b:
+          type: number
+          format: double
+          description: Second operand
+
+    CalculateResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - result
+      properties:
+        result:
+          type: number
+          format: double
+          description: Computed result
+
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - error
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+
+    ErrorDetail:
+      type: object
+      additionalProperties: false
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+          example: INVALID_REQUEST
+        message:
+          type: string
+          description: Human-readable error message
+          example: request body is invalid
