@@ -18,15 +18,11 @@ This document is a human-readable guide to the API. The canonical
 machine-readable contract lives in `api/openapi.yaml`. If there is any
 discrepancy, `api/openapi.yaml` prevails.
 
----
-
 ## Endpoint
 
 ### `POST /api/v1/calculations`
 
 Executes a calculator operation using two numeric operands.
-
----
 
 ## Request
 
@@ -59,8 +55,6 @@ Executes a calculator operation using two numeric operands.
 - `multiply`
 - `divide`
 
----
-
 ## Success Response
 
 ### Success Status
@@ -80,8 +74,6 @@ Executes a calculator operation using two numeric operands.
 | Field    | Type     | Description     |
 | -------- | -------- | --------------- |
 | `result` | `number` | Computed result |
-
----
 
 ## Error Response
 
@@ -103,8 +95,6 @@ All API errors return a consistent JSON structure.
 - `error.code` (`string`): machine-readable error code
 - `error.message` (`string`): human-readable error message
 
----
-
 ## Status Codes
 
 - `200 OK`: successful calculation
@@ -113,8 +103,6 @@ All API errors return a consistent JSON structure.
 - `422 Unprocessable Entity`: mathematically invalid request, such as
   division by zero
 - `500 Internal Server Error`: unexpected server-side error
-
----
 
 ## Error Codes
 
@@ -128,8 +116,6 @@ The set of error codes should remain small and predictable. Refer to
 - `INVALID_NUMBER`: one or more operands are invalid
 - `DIVISION_BY_ZERO`: division by zero is not allowed
 - `INTERNAL_ERROR`: unexpected internal server error
-
----
 
 ## Validation Rules
 
@@ -147,8 +133,6 @@ The set of error codes should remain small and predictable. Refer to
 ### Business Validation
 
 - `divide` must reject `b = 0`
-
----
 
 ## Examples
 
@@ -172,8 +156,6 @@ The set of error codes should remain small and predictable. Refer to
 }
 ```
 
----
-
 ### Division
 
 #### Division Request
@@ -193,8 +175,6 @@ The set of error codes should remain small and predictable. Refer to
   "result": 5
 }
 ```
-
----
 
 ### Invalid Operation
 
@@ -219,8 +199,6 @@ The set of error codes should remain small and predictable. Refer to
 }
 ```
 
----
-
 ### Division by Zero
 
 #### Division by Zero Request
@@ -243,8 +221,6 @@ The set of error codes should remain small and predictable. Refer to
   }
 }
 ```
-
----
 
 ## Contract Design Notes
 

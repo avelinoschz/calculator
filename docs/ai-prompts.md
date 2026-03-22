@@ -28,8 +28,6 @@ The goal is not to document every single prompt, but to preserve the
 most useful prompts that shaped the project structure, implementation
 flow, and review process.
 
----
-
 ## 1. Initial Structure Prompt
 
 Use this prompt before generating implementation code.

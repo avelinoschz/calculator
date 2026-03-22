@@ -170,8 +170,6 @@ core scope is complete:
 - The API contract is documented in OpenAPI format
 - The full stack can be started with Docker Compose
 
----
-
 ## Edge Cases
 
 - Missing input
@@ -183,8 +181,6 @@ core scope is complete:
 - Extra unexpected fields in request
 - Decimal values
 - Negative values
-
----
 
 ## Prioritization
 
@@ -207,8 +203,6 @@ core scope is complete:
   - Optional operations
   - Observability (OpenTelemetry / Jaeger)
   - Extended developer tooling
-
----
 
 ## Project Notes
 

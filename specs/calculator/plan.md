@@ -18,8 +18,6 @@ The plan prioritizes:
 - reviewer experience
 - disciplined scope control
 
----
-
 ## Delivery Strategy
 
 The project should be implemented in small, sequential phases.
@@ -40,8 +38,6 @@ This means the project should first become:
 
 Only after that should optional polish or production-minded extras be
 added.
-
----
 
 ## Implementation Phases
 
@@ -65,8 +61,6 @@ implementation starts.
 - Core scope is clearly defined
 - API contract is stable enough to implement
 - Priorities and de-scope rules are explicit
-
----
 
 ## Phase 1 — Backend Core
 
@@ -95,8 +89,6 @@ calculator operations.
 - Tests pass
 - Backend can be run locally
 
----
-
 ## Phase 2 — Frontend Core
 
 ### Phase 2 Goal
@@ -121,8 +113,6 @@ Build a minimal but clear UI that consumes the backend API.
 - Invalid input is surfaced clearly
 - Backend errors are surfaced clearly
 - Frontend can be run locally
-
----
 
 ## Phase 3 — Developer Experience and Quality Gates
 
@@ -157,8 +147,6 @@ Make the project easy to run, test, lint, and review.
 - Full stack can be started with Docker Compose
 - Basic lint/test/build workflow is codified
 
----
-
 ## Phase 4 — Documentation and Delivery Polish
 
 ### Phase 4 Goal
@@ -183,8 +171,6 @@ Make the project easy to understand and review.
   codebase first
 - Trade-offs are explicit
 
----
-
 ## De-scope Rules
 
 If constraints require de-scoping, reduce scope in this order:
@@ -206,8 +192,6 @@ Do not sacrifice:
 - testability
 - readability
 
----
-
 ## Risk Management
 
 ### Main Risks
@@ -225,8 +209,6 @@ Do not sacrifice:
 - Keep frontend intentionally simple
 - Add tooling only after the end-to-end path works
 - Use the plan as the source of priority decisions
-
----
 
 ## Definition of Done
 

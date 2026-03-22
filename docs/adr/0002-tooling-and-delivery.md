@@ -25,16 +25,12 @@ Rationale:
 - Keeps logging simple and dependency-free
 - Makes logs easier to ingest, parse, and query in centralized logging systems
 
----
-
 ### 2. Use lightweight tooling for quality gates
 
 Rationale:
 
 - Improves code quality
 - Avoids heavy setup
-
----
 
 ### 3. Use Docker pragmatically
 
@@ -47,8 +43,6 @@ Rationale:
 - Reproducible environment
 - Easy reviewer setup
 
----
-
 ### 4. Provide a Makefile
 
 The project will include a Makefile with common commands.
@@ -57,8 +51,6 @@ Goals:
 
 - Simplify workflows
 - Standardize commands
-
----
 
 ### 5. Provide CI readiness (not full CD)
 
@@ -73,8 +65,6 @@ Rationale:
 - Demonstrates good practices
 - Avoids unnecessary complexity
 
----
-
 ### 6. Prioritize core over optional features
 
 Core features must be completed before optional enhancements.
@@ -83,8 +73,6 @@ Rationale:
 
 - Ensures a complete and stable submission
 - Avoids partially implemented features
-
----
 
 ### 7. Treat observability as a production-minded consideration (not a core dependency)
 
@@ -115,8 +103,6 @@ Rationale:
 
 - Limited automation compared to production systems
 - Observability remains minimal
-
----
 
 ## Notes
 

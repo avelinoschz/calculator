@@ -23,8 +23,6 @@ Implications:
 - Avoid heavy frameworks
 - Keep file and package structure small and explicit
 
----
-
 ### 2. Separate business logic from transport logic
 
 Calculator operations will be implemented independently from HTTP handlers.
@@ -40,8 +38,6 @@ Rationale:
 - Reduces coupling
 - Keeps logic easy to reason about
 
----
-
 ### 3. Use a minimal REST API with a single endpoint
 
 The API will expose a single endpoint, `POST /api/v1/calculations`.
@@ -52,8 +48,6 @@ Rationale:
 - Avoids duplication across multiple endpoints
 - Simplifies frontend integration
 
----
-
 ### 4. Use a stable JSON response model
 
 All responses follow consistent success and error shapes defined by the API contract.
@@ -63,8 +57,6 @@ Rationale:
 - Simplifies client handling
 - Improves consistency
 - Aligns with OpenAPI contract
-
----
 
 ### 5. Validate on both frontend and backend
 
@@ -79,8 +71,6 @@ Backend:
 
 - Source of truth
 - Guarantees correctness
-
----
 
 ### 6. Use Go standard library for HTTP
 
@@ -104,8 +94,6 @@ Rationale:
 
 - Less extensible for large-scale evolution
 - No advanced routing features
-
----
 
 ## Notes
 
