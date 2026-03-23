@@ -28,14 +28,26 @@ engineering practices.
 - Validate user input before submitting
 - Display clear error messages
 - Support basic responsive behavior for mobile screens
+- Isolate all API calls into a dedicated API layer (separate from React
+  components), mirroring the backend's domain/handler separation
+- Dev server must proxy `/api/*` requests to the backend at
+  `http://localhost:8080`
+- Tests must cover three independent layers:
+  1. API layer (fetch wrapper, typed requests/responses)
+  2. Component layer (form rendering, client-side validation)
+  3. Integration layer (full app tree with mocked fetch)
 
 ### Backend
 
-- Expose a REST API endpoint for calculator operations
+- Expose a REST API for calculator operations:
+  - `GET /health` — liveness check
+  - `POST /api/v1/calculations` — perform a calculation
 - Validate request payloads
 - Handle edge cases
 - Return JSON responses
 - Implement structured logging
+- Graceful shutdown on `SIGINT`/`SIGTERM` (10-second drain timeout)
+- Embed a version string in the binary at build time
 
 ## Quality Requirements
 
@@ -58,9 +70,36 @@ engineering practices.
 - Prefer a single calculation endpoint over multiple operation-specific
   endpoints unless there is a strong reason not to
 
-### Proposed API Shape
+### API Endpoints
 
+- `GET /health` → `{ "status": "ok" }` (200)
 - `POST /api/v1/calculations`
+  - Request: `{ "op": string, "a": number, "b": number }`
+  - Success (200): `{ "result": number }`
+  - Error: `{ "error": { "code": string, "message": string } }`
+
+### HTTP Status Codes
+
+| Status | Meaning |
+| ------ | ------- |
+| 200 | Successful calculation |
+| 400 | Invalid/malformed request, unknown operation, missing field |
+| 422 | Division by zero |
+| 500 | Internal server error |
+
+### Error Codes
+
+| Code | Trigger |
+| ---- | ------- |
+| `INVALID_REQUEST` | Malformed JSON or unparseable body |
+| `MISSING_FIELD` | Required field absent from request |
+| `INVALID_OPERATION` | `op` value is not one of the four supported operations |
+| `DIVISION_BY_ZERO` | `b` is zero when `op` is `divide` |
+| `INTERNAL_ERROR` | Unexpected server-side failure |
+
+### Schema Constraints
+
+- `additionalProperties: false` — extra fields in the request body are rejected
 
 ## Dev & Tooling Requirements
 
@@ -79,14 +118,19 @@ engineering practices.
 - Build tool: Vite
 - Testing: `vitest`, `React Testing Library`, `@testing-library/user-event`
 - Styling: plain CSS (no UI framework)
+- Linting: ESLint with TypeScript and React plugins
+
+### Docs tooling
+
+- Linting: `markdownlint` (configured via `.markdownlint.json`)
 
 ## Developer Experience Requirements
 
 - Provide a `Makefile` with common development commands
 - Support both local development and Docker-based development flows
 - Keep developer commands simple and discoverable
-- Provide a small set of common targets for run, test, lint, build,
-  and Docker-based workflows.
+- Provide targets for: setup, run, test, lint, format, build,
+  and Docker-based workflows
 
 ## Containerization
 
@@ -95,16 +139,23 @@ engineering practices.
 ### Backend container
 
 - Use a **multi-stage Dockerfile**:
-  - Stage 1: build the Go binary
-  - Stage 2: minimal runtime image (e.g., distroless or alpine)
+  - Stage 1: build the Go binary (`golang:alpine`)
+  - Stage 2: minimal runtime image (`distroless/static`)
 
 ### Frontend container
 
-- Dockerfile to build and serve the frontend
+- Use a **multi-stage Dockerfile**:
+  - Stage 1: build static assets (`node:20-alpine`)
+  - Stage 2: serve with `nginx:alpine`
 
 ### Orchestration
 
-- Use Docker Compose to orchestrate frontend + backend together for local execution
+- Use Docker Compose to orchestrate frontend + backend together
+- The frontend container runs nginx, which:
+  - Serves static assets from `/usr/share/nginx/html`
+  - Proxies `/api/` requests to the backend container
+  - Falls back to `index.html` for SPA routing
+- An `nginx.conf` file configures this routing
 
 ## CI (Continuous Integration)
 

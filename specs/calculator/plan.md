@@ -10,6 +10,22 @@ realistic delivery strategy.
 This plan derives from `specs/calculator/requirements.md`. The API
 contract described here should be validated against `api/openapi.yaml`.
 
+## Delivered State
+
+All four phases were completed. The first cut of the calculator is
+fully functional and includes:
+
+- Go backend with domain/handler separation, structured logging,
+  graceful shutdown, and version embedding
+- React + TypeScript frontend with isolated API layer, three-layer tests,
+  and responsive plain-CSS styling
+- `POST /api/v1/calculations` and `GET /health` endpoints
+- Consistent JSON error responses with typed error codes
+- Multi-stage Dockerfiles (distroless backend, nginx frontend)
+- Docker Compose with nginx API proxy
+- Makefile with setup, run, test, lint, format, build, and Docker targets
+- GitHub Actions CI (lint, test, build for both services)
+
 The plan prioritizes:
 
 - core completeness
@@ -41,7 +57,7 @@ added.
 
 ## Implementation Phases
 
-## Phase 0 — Specification Alignment
+## Phase 0 — Specification Alignment [COMPLETED]
 
 ### Phase 0 Goal
 
@@ -52,9 +68,11 @@ implementation starts.
 
 - `specs/calculator/requirements.md`
 - `docs/adr/0001-architecture-and-api.md`
+- `docs/adr/0002-tooling-and-delivery.md`
 - `specs/calculator/api.md`
 - `api/openapi.yaml`
 - `specs/calculator/plan.md`
+- `AGENTS.md` — AI collaboration guidance (added beyond original scope)
 
 ### Phase 0 Exit Criteria
 
@@ -62,7 +80,7 @@ implementation starts.
 - API contract is stable enough to implement
 - Priorities and de-scope rules are explicit
 
-## Phase 1 — Backend Core
+## Phase 1 — Backend Core [COMPLETED]
 
 ### Phase 1 Goal
 
@@ -98,7 +116,7 @@ calculator operations.
 - Graceful shutdown on `SIGINT` / `SIGTERM`
 - Unit tests for domain logic and HTTP handlers
 
-## Phase 2 — Frontend Core
+## Phase 2 — Frontend Core [COMPLETED]
 
 ### Phase 2 Goal
 
@@ -132,8 +150,9 @@ Build a minimal but clear UI that consumes the backend API.
 - Responsive layout with plain CSS
 - Unit and integration tests across API layer, component layer, and full app
 - Frontend Dockerfile (build + serve)
+- `docs/adr/0003-frontend-architecture.md` (added beyond original scope)
 
-## Phase 3 — Developer Experience and Quality Gates
+## Phase 3 — Developer Experience and Quality Gates [COMPLETED]
 
 ### Phase 3 Goal
 
@@ -148,17 +167,16 @@ Make the project easy to run, test, lint, and review.
 - Add Docker Compose for full-stack execution
 - Add basic GitHub Actions workflow for lint, test, and build
 
-### Phase 3 Expected Make Targets
+### Phase 3 Make Targets (delivered)
 
-- `make help`
-- `make backend.run`
-- `make frontend.run`
-- `make test`
-- `make lint`
-- `make build`
-- `make docker.build`
-- `make up`
-- `make down`
+- `make setup` / `make backend.setup` / `make frontend.setup` / `make docs.setup`
+- `make run` / `make backend.run` / `make frontend.run`
+- `make test` / `make backend.test` / `make frontend.test`
+- `make lint` / `make backend.lint` / `make frontend.lint` / `make docs.lint`
+- `make format` / `make backend.format` / `make frontend.format`
+- `make build` / `make backend.build` / `make frontend.build`
+- `make docker.build` / `make backend.docker.build` / `make frontend.docker.build`
+- `make up` / `make down`
 
 ### Phase 3 Exit Criteria
 
@@ -166,7 +184,7 @@ Make the project easy to run, test, lint, and review.
 - Full stack can be started with Docker Compose
 - Basic lint/test/build workflow is codified
 
-## Phase 4 — Documentation and Delivery Polish
+## Phase 4 — Documentation and Delivery Polish [COMPLETED]
 
 ### Phase 4 Goal
 
@@ -182,6 +200,10 @@ Make the project easy to understand and review.
 - Add trade-offs and future improvements
 - Verify file structure and naming consistency
 - Remove dead code or unnecessary complexity
+
+### Phase 4 Extra Deliverables
+
+- `docs/ai-prompts.md` — representative AI prompts used during development
 
 ### Phase 4 Exit Criteria
 
