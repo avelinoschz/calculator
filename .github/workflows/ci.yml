@@ -32,8 +32,9 @@ jobs:
         working-directory: .
         run: make backend.lint
 
-      - name: Test
-        run: go test ./...
+      - name: Test with coverage
+        working-directory: .
+        run: make backend.coverage
 
       - name: Build
         run: go build -o bin/server ./cmd/server
@@ -59,8 +60,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Test
-        run: npx vitest run
+      - name: Test with coverage
+        working-directory: .
+        run: make frontend.coverage
 
       - name: Build
         run: npm run build

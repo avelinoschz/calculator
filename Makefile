@@ -13,7 +13,7 @@ export GOBIN := $(INSTALL_BIN_DIR)
 	backend.setup frontend.setup docs.setup setup \
 	backend.run frontend.run run \
 	backend.test frontend.test test \
-	backend.coverage frontend.coverage coverage \
+	backend.coverage backend.coverage.html frontend.coverage coverage \
 	backend.lint frontend.lint docs.lint lint \
 	backend.format frontend.format format \
 	backend.build frontend.build build \
@@ -62,10 +62,13 @@ test: backend.test frontend.test ## Run all tests
 
 # ── Coverage ──────────────────────────────────────────────────────────────────
 
-backend.coverage: ## Run Go tests with coverage report
+backend.coverage: ## Run Go tests and print per-function coverage summary
 	cd backend && go test $(GO_TEST_FLAGS) $(GO_COVERAGE_FLAGS) ./... && go tool cover -func=coverage.out
 
-frontend.coverage: ## Run Vitest with coverage report
+backend.coverage.html: ## Run Go tests and generate coverage.html for browser viewing
+	cd backend && go test $(GO_TEST_FLAGS) $(GO_COVERAGE_FLAGS) ./... && go tool cover -html=coverage.out -o coverage.html
+
+frontend.coverage: ## Run Vitest with coverage report (text + lcov)
 	cd frontend && npx vitest run --coverage
 
 coverage: backend.coverage frontend.coverage ## Run all tests with coverage reports
