@@ -17,6 +17,9 @@ engineering practices.
   - Subtraction
   - Multiplication
   - Division
+- Support configurable operand limits (min/max) via environment variables
+  (`CALC_MIN`, `CALC_MAX` on the backend; `VITE_CALC_MIN`, `VITE_CALC_MAX`
+  on the frontend). When unset, no limit is applied.
 
 ### Frontend
 
@@ -84,7 +87,7 @@ engineering practices.
 | ------ | ------- |
 | 200 | Successful calculation |
 | 400 | Invalid/malformed request, unknown operation, missing field |
-| 422 | Division by zero |
+| 422 | Division by zero; operand outside configured limits |
 | 500 | Internal server error |
 
 ### Error Codes
@@ -95,6 +98,7 @@ engineering practices.
 | `MISSING_FIELD` | Required field absent from request |
 | `INVALID_OPERATION` | `op` value is not one of the four supported operations |
 | `DIVISION_BY_ZERO` | `b` is zero when `op` is `divide` |
+| `OPERAND_OUT_OF_RANGE` | `a` or `b` is outside the configured min/max range |
 | `INTERNAL_ERROR` | Unexpected server-side failure |
 
 ### Schema Constraints
@@ -208,6 +212,7 @@ core scope is complete:
 - The frontend displays the result clearly
 - Invalid input is rejected with a helpful error message
 - Division by zero is handled safely and clearly
+- Operands outside the configured limits are rejected with a clear error
 
 ### Non-Functional
 
@@ -228,6 +233,7 @@ core scope is complete:
 - Empty strings
 - Invalid operation
 - Division by zero
+- Operand value outside configured min/max limits
 - Malformed JSON request
 - Extra unexpected fields in request
 - Decimal values
