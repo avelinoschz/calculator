@@ -19,6 +19,7 @@ export GOBIN := $(INSTALL_BIN_DIR)
 	backend.build frontend.build build \
 	backend.clean frontend.clean clean \
 	backend.docker.build frontend.docker.build docker.build \
+	backend.docker.run frontend.docker.run \
 	up down
 
 help: ## Show available make targets
@@ -120,6 +121,12 @@ up: ## Start the full stack with Docker Compose
 
 down: ## Stop the full stack
 	docker compose down
+
+backend.docker.run: ## Run the backend service via Docker Compose
+	docker compose up backend --build
+
+frontend.docker.run: ## Run the frontend service via Docker Compose
+	docker compose up frontend --build
 
 # ── Clean ─────────────────────────────────────────────────────────────────────
 
