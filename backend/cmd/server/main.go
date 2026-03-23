@@ -13,9 +13,12 @@ import (
 	"github.com/avelinoschz/calculator/backend/internal/handler"
 )
 
+var version = "dev" // set via -ldflags at build time
+
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
+	slog.Info("starting", "version", version)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", handler.Health)
