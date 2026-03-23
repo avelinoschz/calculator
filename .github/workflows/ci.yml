@@ -34,7 +34,7 @@ jobs:
 
       - name: Test with coverage
         working-directory: .
-        run: make backend.coverage
+        run: make backend.test
 
       - name: Build
         run: go build -o bin/server ./cmd/server

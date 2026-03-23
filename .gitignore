@@ -1,3 +1,7 @@
+.DS_Store
 node_modules/
 dist/
 bin/
+coverage.out
+coverage.html
+coverage/
