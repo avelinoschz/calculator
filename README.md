@@ -59,9 +59,25 @@ Representative prompts used during development can be found in:
 
 `POST /api/v1/calculations`
 
+### Quick example
+
+```sh
+curl -s -X POST http://localhost:8080/api/v1/calculations \
+  -H 'Content-Type: application/json' \
+  -d '{"op": "divide", "a": 10, "b": 3}' | jq .
+```
+
+```json
+{
+  "result": 3.3333333333333335
+}
+```
+
+Division by zero returns HTTP 422 with `"code": "DIVISION_BY_ZERO"`.
+
 See [`specs/calculator/api.md`](specs/calculator/api.md) and
 [`api/openapi.yaml`](api/openapi.yaml) for the full contract, or
-[`backend/README.md`](backend/README.md) for runnable examples.
+[`backend/README.md`](backend/README.md) for more examples.
 
 ## How to Run
 
@@ -129,12 +145,37 @@ See [`backend/README.md`](backend/README.md) and
 [`frontend/README.md`](frontend/README.md) for detailed structure and
 per-service commands.
 
-## Design
+## Design Summary
 
-Key design decisions are documented in:
+- **Single endpoint** (`POST /api/v1/calculations`) — one stable API surface; operation type is a request field, not a route.
+- **Separated layers** — calculator domain logic (`internal/calculator`) is independent of HTTP handlers; testable without network.
+- **Dual validation** — frontend validates for UX; backend is the authoritative source and always validates.
+- **Standard library only** — Go `net/http` and `log/slog`; no frameworks needed at this scale.
+- **Isolated API layer** — frontend `src/api/` is decoupled from UI components and mocked independently in tests.
 
-- `docs/adr/0001-architecture-and-api.md`
-- `docs/adr/0002-tooling-and-delivery.md`
+Full rationale in [`docs/adr/0001-architecture-and-api.md`](docs/adr/0001-architecture-and-api.md),
+[`docs/adr/0002-tooling-and-delivery.md`](docs/adr/0002-tooling-and-delivery.md), and
+[`docs/adr/0003-frontend-architecture.md`](docs/adr/0003-frontend-architecture.md).
+
+## Trade-offs
+
+| Decision | Rationale |
+| --- | --- |
+| Single calculation endpoint | Simpler API surface; avoids per-operation route proliferation |
+| No persistence | Out of scope; stateless API is easier to test and deploy |
+| Plain CSS, no UI framework | Minimal frontend dependency footprint |
+| No authentication | Out of scope for a local demo |
+| Distroless runtime image | Minimal attack surface; no shell in the production container |
+| `net/http` over a framework | Sufficient for one endpoint; avoids unnecessary abstractions |
+
+### Future improvements
+
+If the scope were to grow:
+
+- Add calculation history backed by a database
+- Add OpenTelemetry tracing (noted as optional in requirements)
+- Add more operations (exponentiation, square root, percentage)
+- Add rate limiting and authentication for a public deployment
 
 ## Notes
 
