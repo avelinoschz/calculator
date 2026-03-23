@@ -79,7 +79,7 @@ frontend.lint: ## Run ESLint
 	cd frontend && npm run lint
 
 docs.lint: ## Run markdownlint on all markdown files
-	./node_modules/.bin/markdownlint **/*.md
+	./node_modules/.bin/markdownlint --ignore '**/node_modules/**' '**/*.md'
 
 lint: backend.lint frontend.lint docs.lint ## Run all linters
 
