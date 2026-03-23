@@ -132,155 +132,25 @@ Basic responsive layout for mobile
 Start by reading the spec files listed above, then plan before implementing.
 ```
 
-## 3. Tooling and Delivery Prompt
+## 3. Other Phase Variants
 
-Used this prompt to implement the developer-experience and quality-gate
-phase after both backend and frontend core functionality were already in
-place.
+The same implementation-prompt pattern was reused for the later phases,
+with the repository state, completed phases, and constraints updated to
+match the next step in the plan.
 
-Its purpose was to keep the final project setup aligned with the
-documented delivery requirements: simple developer workflows, Docker
-support, CI checks, and minimal tooling that improved reliability
-without expanding scope.
+For Phase 3, the prompt shifted from product functionality to developer
+experience and delivery requirements such as Make targets, Docker,
+Docker Compose, and CI automation.
 
-This prompt was most useful once the application code and API behavior
-were already stable, since it explicitly focused on Make targets,
-containerization, and automation rather than product features.
+For Phase 4, the prompt shifted again toward documentation quality,
+reviewer usability, and concise delivery polish without reopening stable
+application code.
 
-```text
-This is a full-stack calculator project. The repository is at /Users/avelino/repos/github.com/avelinoschz/calculator.
+These later prompts were useful in practice, but they followed the same
+core structure as the frontend implementation prompt above, so they are
+summarized here rather than repeated in full.
 
-Phases 1 (Go backend) and 2 (React frontend) are complete. Read the following
-files before doing anything:
-
-  AGENTS.md                          — implementation rules and priorities
-  specs/calculator/requirements.md   — scope and acceptance criteria
-  specs/calculator/plan.md           — phased delivery plan
-
-What is already built:
-
-  backend/
-    cmd/server/main.go                  ← entry point, graceful shutdown
-    internal/calculator/calculator.go   ← domain logic, sentinel errors
-    internal/calculator/calculator_test.go
-    internal/handler/handler.go         ← HTTP handlers (GET /health, POST /api/v1/calculations)
-    internal/handler/handler_test.go
-    internal/handler/models.go
-    go.mod / go.sum
-
-  frontend/
-    src/api/calculator.ts               ← fetch client, isolated from UI
-    src/components/CalculatorForm.tsx   ← form with client-side validation
-    src/App.tsx                         ← root component
-    src/main.tsx
-    src/App.css
-    index.html
-    package.json / tsconfig.json
-    vite.config.ts                      ← dev proxy /api → :8080, Vitest config
-    Dockerfile                          ← node:20-alpine build → nginx:alpine serve
-
-The backend runs on :8080. The frontend dev server runs on :5173 and proxies
-/api to the backend. The frontend Dockerfile already exists.
-
-Your task
-
-Implement Phase 3 — Developer Experience and Quality Gates — as described in
-specs/calculator/plan.md.
-
-The expected Makefile targets are:
-
-  make help
-  make backend.run
-  make frontend.run
-  make test
-  make lint
-  make build
-  make docker.build
-  make up
-  make down
-
-Key constraints:
-
-  - The backend Dockerfile must use a multi-stage build (build stage + minimal
-    runtime image such as distroless or alpine)
-  - Docker Compose must orchestrate both frontend and backend together
-  - The GitHub Actions workflow must run lint, test, and build
-  - The frontend Dockerfile already exists — do not recreate it
-  - Do not change any backend or frontend source code
-
-Start by reading the spec files listed above, then plan before implementing.
-```
-
-## 4. Documentation and Delivery Polish Prompt
-
-Used this prompt to complete the final documentation and delivery-polish
-phase after the backend, frontend, and developer-experience work were
-already in place.
-
-Its purpose was to improve reviewer usability without reopening stable
-application code, focusing on concise documentation, setup clarity, API
-usage guidance, and explicit trade-offs that matched the project's
-small, maintainable scope.
-
-This prompt was most useful once the implementation, tooling, and
-delivery workflow were already stable, since it explicitly constrained
-the work to polish, clarity, and final review readiness rather than new
-features.
-
-Summary: use this prompt for the final pass that makes the project easy
-to run, understand, and evaluate.
-
-```text
-This is a full-stack calculator project. The repository is at /Users/avelino/repos/github.com/avelinoschz/calculator.
-
-Phases 1 (Go backend), 2 (React frontend), and 3 (Developer Experience and Quality Gates) are complete. Read the following files before doing anything:
-
-
-AGENTS.md                          — implementation rules and priorities
-specs/calculator/requirements.md   — scope and acceptance criteria
-specs/calculator/plan.md           — phased delivery plan
-What is already built:
-
-
-backend/
-  cmd/server/main.go                  ← entry point, graceful shutdown
-  internal/calculator/calculator.go   ← domain logic, sentinel errors
-  internal/calculator/calculator_test.go
-  internal/handler/handler.go         ← HTTP handlers (GET /health, POST /api/v1/calculations)
-  internal/handler/handler_test.go
-  internal/handler/models.go
-  Dockerfile                          ← golang:alpine build → distroless/static runtime
-  .golangci.yml                       ← golangci-lint config
-  go.mod / go.sum
-
-frontend/
-  src/api/calculator.ts               ← fetch client, isolated from UI
-  src/components/CalculatorForm.tsx   ← form with client-side validation
-  src/App.tsx                         ← root component
-  src/main.tsx
-  src/App.css
-  index.html
-  package.json / tsconfig.json
-  vite.config.ts                      ← dev proxy /api → :8080, Vitest config
-  Dockerfile                          ← node:20-alpine build → nginx:alpine serve
-
-Makefile                              ← run, test, lint, build, docker, compose targets
-docker-compose.yml                    ← orchestrates backend (:8080) and frontend (:80)
-nginx.conf                            ← proxies /api/ to backend; mounted by Compose
-.github/workflows/ci.yml             ← lint + test + build for backend and frontend
-The README has already been updated to include local run instructions, Docker Compose instructions, and a full Makefile target reference.
-
-Your task is to implement Phase 4 — Documentation and Delivery Polish as described in specs/calculator/plan.md.
-
-Key constraints:
-
-Do not change any backend or frontend source code
-The README already has run instructions and a Makefile reference — avoid duplicating them, only extend where genuinely missing
-Keep additions concise; this is a small project and the docs should match its scope
-Start by reading the spec files and the current README.md, then plan before implementing.
-```
-
-## 5. Reviewer Prompt
+## 4. Reviewer Prompt
 
 Use this prompt after a meaningful implementation step, such as backend
 core, frontend core, or a final review pass.
