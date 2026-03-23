@@ -99,6 +99,24 @@ Avoid implementing:
   - validation errors
   - API error handling
 
+## Documentation Rules
+
+Any new feature, Make target, or tooling addition must include corresponding
+documentation updates. Specifically:
+
+- **`README.md`** (root) — update the Makefile targets table if a new target
+  is added
+- **`backend/README.md`** — update the Makefile targets table and add a
+  dedicated section (e.g. under Testing, Linting, Build) when a new
+  backend-scoped command or workflow is introduced
+- **`frontend/README.md`** — same as above for frontend-scoped additions
+- **`docs/adr/`** — add a new ADR when a significant architectural or tooling
+  decision is made
+
+Documentation must be updated in the same change as the feature itself, not
+as a follow-up. Use the coverage target addition (Makefile + `backend/README.md`
++ `frontend/README.md` + root `README.md`) as a reference example.
+
 ## Tooling Rules
 
 - Use `golangci-lint` for Go
