@@ -140,10 +140,13 @@ curl -s -X POST http://localhost:8080/api/v1/calculations \
 
 | Target | Description |
 | --- | --- |
+| `make backend.setup` | Install backend tooling and download Go module dependencies |
 | `make backend.run` | Run the Go server (port 8080) |
 | `make backend.test` | Run Go tests |
 | `make backend.lint` | Run golangci-lint |
+| `make backend.format` | Auto-fix Go lint issues |
 | `make backend.build` | Build binary → `backend/bin/server` |
+| `make backend.clean` | Remove build artifacts (`backend/bin/`) |
 | `make backend.docker.build` | Build the backend Docker image |
 
 ## Testing
@@ -156,6 +159,9 @@ cd backend && go test ./...
 
 Tests use `testify` and follow a table-driven pattern. The calculator
 domain logic and HTTP handlers are tested independently.
+
+Tests run with `-shuffle=on -count=1` to catch order-dependent failures
+and disable Go's result cache so tests always execute.
 
 ## Linting
 
@@ -183,6 +189,14 @@ cd backend && go build -o bin/server ./cmd/server
 ```
 
 Output binary: `backend/bin/server`.
+
+The current git commit SHA is embedded at build time via `-ldflags "-X main.version=<SHA>"` and logged on startup:
+
+```json
+{"time":"...","level":"INFO","msg":"starting","version":"7880150..."}
+```
+
+When running outside of a git repo the version defaults to `dev`.
 
 ## Docker
 

@@ -118,10 +118,13 @@ make help
 
 | Target | Description |
 | --- | --- |
+| `make setup` | Bootstrap local environment (tools + dependencies) |
 | `make run` | Run backend and frontend locally in parallel |
 | `make test` | Run all tests |
 | `make lint` | Run all linters |
+| `make format` | Auto-fix all lint issues |
 | `make build` | Build backend binary and frontend assets |
+| `make clean` | Remove all build artifacts |
 | `make docker.build` | Build all Docker images |
 | `make up` | Start the full stack with Docker Compose |
 | `make down` | Stop the full stack |

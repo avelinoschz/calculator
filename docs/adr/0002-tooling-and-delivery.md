@@ -42,12 +42,41 @@ A `make backend.setup` target installs all backend tooling at the pinned
 version. CI runs the same target, ensuring local and CI environments are
 identical.
 
+Tool versions are pinned to exact semver in the Makefile (e.g.
+`GOLANGCI_LINT_VERSION := v1.64.8`) rather than `latest`.
+
 Rationale:
 
 - No dependency on system-installed tool versions
 - Reproducible across machines and CI runners
 - Avoids version mismatch between the project's Go version and pre-built
   tool binaries (e.g. `golangci-lint` built for an older Go release)
+- Using `latest` can silently introduce breaking lint rules between runs
+
+### 10. Embed git SHA in the binary via ldflags
+
+The `VERSION` variable is captured from `git rev-parse HEAD` at
+build and run time:
+
+```makefile
+VERSION ?= $(shell git rev-parse HEAD 2>/dev/null || echo "dev")
+GO_BUILD_FLAGS := -ldflags "-X main.version=$(VERSION)"
+```
+
+The value is injected into a package-level `var version = "dev"` in
+`cmd/server/main.go` and logged at startup:
+
+```json
+{"level":"INFO","msg":"starting","version":"7880150..."}
+```
+
+Outside a git repository the version falls back to `"dev"`.
+
+Rationale:
+
+- Zero-cost traceability — no extra package or runtime overhead
+- Visible immediately in startup logs; no need to query a separate API
+- Makes it trivial to correlate a running instance with the exact commit
 
 ### 3. Use Docker pragmatically
 

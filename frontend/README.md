@@ -60,10 +60,13 @@ the `nginx.conf` at the repository root, which proxies `/api/` to the
 
 | Target | Description |
 | --- | --- |
+| `make frontend.setup` | Install Node dependencies (npm ci) |
 | `make frontend.run` | Run the Vite dev server (port 5173) |
 | `make frontend.test` | Run Vitest (single-run) |
 | `make frontend.lint` | Run ESLint |
+| `make frontend.format` | Auto-fix frontend lint issues |
 | `make frontend.build` | Build static assets → `frontend/dist/` |
+| `make frontend.clean` | Remove build artifacts (`frontend/dist/`) |
 | `make frontend.docker.build` | Build the frontend Docker image |
 
 ## Testing
