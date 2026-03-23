@@ -5,7 +5,7 @@ export PATH := $(INSTALL_BIN_DIR):$(PATH)
 export GOBIN := $(INSTALL_BIN_DIR)
 
 .PHONY: help \
-	backend.setup \
+	backend.setup frontend.setup setup \
 	backend.run frontend.run run \
 	backend.test frontend.test test \
 	backend.lint frontend.lint lint \
@@ -19,8 +19,14 @@ help: ## Show available make targets
 
 # ── Setup ─────────────────────────────────────────────────────────────────────
 
-backend.setup: ## Install backend tooling into bin/
+backend.setup: ## Install backend tooling and download Go module dependencies
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
+	cd backend && go mod download
+
+frontend.setup: ## Install Node dependencies (npm ci)
+	cd frontend && npm ci
+
+setup: backend.setup frontend.setup ## Bootstrap local environment (tools + dependencies)
 
 # ── Run ───────────────────────────────────────────────────────────────────────
 
