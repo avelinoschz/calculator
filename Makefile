@@ -4,6 +4,7 @@ GOLANGCI_LINT_VERSION := v1.64.8
 
 GO_BUILD_FLAGS := -ldflags "-X main.version=$(VERSION)"
 GO_TEST_FLAGS := -shuffle=on -count=1
+GO_COVERAGE_FLAGS := -coverprofile=coverage.out -covermode=atomic
 
 export PATH := $(INSTALL_BIN_DIR):$(PATH)
 export GOBIN := $(INSTALL_BIN_DIR)
@@ -12,6 +13,7 @@ export GOBIN := $(INSTALL_BIN_DIR)
 	backend.setup frontend.setup docs.setup setup \
 	backend.run frontend.run run \
 	backend.test frontend.test test \
+	backend.coverage frontend.coverage coverage \
 	backend.lint frontend.lint docs.lint lint \
 	backend.format frontend.format format \
 	backend.build frontend.build build \
@@ -57,6 +59,16 @@ frontend.test: ## Run Vitest (single-run)
 	cd frontend && npx vitest run
 
 test: backend.test frontend.test ## Run all tests
+
+# ── Coverage ──────────────────────────────────────────────────────────────────
+
+backend.coverage: ## Run Go tests with coverage report
+	cd backend && go test $(GO_TEST_FLAGS) $(GO_COVERAGE_FLAGS) ./... && go tool cover -func=coverage.out
+
+frontend.coverage: ## Run Vitest with coverage report
+	cd frontend && npx vitest run --coverage
+
+coverage: backend.coverage frontend.coverage ## Run all tests with coverage reports
 
 # ── Lint ──────────────────────────────────────────────────────────────────────
 
