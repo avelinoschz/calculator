@@ -1,5 +1,9 @@
+VERSION ?= $(shell git rev-parse HEAD 2>/dev/null || echo "dev")
 INSTALL_BIN_DIR := $(CURDIR)/bin
-GOLANGCI_LINT_VERSION := latest
+GOLANGCI_LINT_VERSION := v1.64.8
+
+GO_BUILD_FLAGS := -ldflags "-X main.version=$(VERSION)"
+GO_TEST_FLAGS := -shuffle=on -count=1
 
 export PATH := $(INSTALL_BIN_DIR):$(PATH)
 export GOBIN := $(INSTALL_BIN_DIR)
@@ -9,7 +13,9 @@ export GOBIN := $(INSTALL_BIN_DIR)
 	backend.run frontend.run run \
 	backend.test frontend.test test \
 	backend.lint frontend.lint lint \
+	backend.format frontend.format format \
 	backend.build frontend.build build \
+	backend.clean frontend.clean clean \
 	backend.docker.build frontend.docker.build docker.build \
 	up down
 
@@ -31,7 +37,7 @@ setup: backend.setup frontend.setup ## Bootstrap local environment (tools + depe
 # ── Run ───────────────────────────────────────────────────────────────────────
 
 backend.run: ## Run the Go backend (port 8080)
-	cd backend && go run ./cmd/server
+	cd backend && go run $(GO_BUILD_FLAGS) ./cmd/server
 
 frontend.run: ## Run the Vite dev server (port 5173)
 	cd frontend && npm run dev
@@ -42,7 +48,7 @@ run: ## Run backend and frontend locally in parallel
 # ── Test ──────────────────────────────────────────────────────────────────────
 
 backend.test: ## Run Go tests
-	cd backend && go test ./...
+	cd backend && go test $(GO_TEST_FLAGS) ./...
 
 frontend.test: ## Run Vitest (single-run)
 	cd frontend && npx vitest run
@@ -59,10 +65,20 @@ frontend.lint: ## Run ESLint
 
 lint: backend.lint frontend.lint ## Run all linters
 
+# ── Format ────────────────────────────────────────────────────────────────────
+
+backend.format: ## Auto-fix Go lint issues
+	cd backend && $(INSTALL_BIN_DIR)/golangci-lint run --fix ./...
+
+frontend.format: ## Auto-fix frontend lint issues
+	cd frontend && npm run lint -- --fix
+
+format: backend.format frontend.format ## Auto-fix all lint issues
+
 # ── Build ─────────────────────────────────────────────────────────────────────
 
 backend.build: ## Build Go binary → backend/bin/server
-	cd backend && go build -o bin/server ./cmd/server
+	cd backend && go build $(GO_BUILD_FLAGS) -o bin/server ./cmd/server
 
 frontend.build: ## Build frontend static assets → frontend/dist/
 	cd frontend && npm run build
@@ -86,3 +102,13 @@ up: ## Start the full stack with Docker Compose
 
 down: ## Stop the full stack
 	docker compose down
+
+# ── Clean ─────────────────────────────────────────────────────────────────────
+
+backend.clean: ## Remove backend build artifacts (backend/bin/)
+	rm -rf backend/bin
+
+frontend.clean: ## Remove frontend build artifacts (frontend/dist/)
+	rm -rf frontend/dist
+
+clean: backend.clean frontend.clean ## Remove all build artifacts
