@@ -32,6 +32,23 @@ Rationale:
 - Improves code quality
 - Avoids heavy setup
 
+### 9. Pin tool binaries locally in bin/
+
+Developer tools (e.g. `golangci-lint`) are installed into a project-local
+`bin/` directory via `GOBIN`. The Makefile exports `GOBIN := $(CURDIR)/bin`
+so `go install` always writes there, not to the system `$GOPATH/bin`.
+
+A `make backend.setup` target installs all backend tooling at the pinned
+version. CI runs the same target, ensuring local and CI environments are
+identical.
+
+Rationale:
+
+- No dependency on system-installed tool versions
+- Reproducible across machines and CI runners
+- Avoids version mismatch between the project's Go version and pre-built
+  tool binaries (e.g. `golangci-lint` built for an older Go release)
+
 ### 3. Use Docker pragmatically
 
 - Backend uses multi-stage Docker build
