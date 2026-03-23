@@ -13,6 +13,30 @@ const OPERATIONS: { value: Operation; label: string }[] = [
   { value: 'divide', label: 'Divide (÷)' },
 ]
 
+function parseOperand(value: string): number | null {
+  const trimmed = value.trim()
+  if (trimmed === '') {
+    return null
+  }
+
+  const parsed = Number(trimmed)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+function parseLimit(value: string | undefined): number | null {
+  if (value === undefined) {
+    return null
+  }
+
+  const trimmed = value.trim()
+  if (trimmed === '') {
+    return null
+  }
+
+  const parsed = Number(trimmed)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
 export function CalculatorForm({ onSubmit, loading }: Props) {
   const [a, setA] = useState('')
   const [b, setB] = useState('')
@@ -27,18 +51,16 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
       return
     }
 
-    const numA = parseFloat(a)
-    const numB = parseFloat(b)
+    const numA = parseOperand(a)
+    const numB = parseOperand(b)
 
-    if (isNaN(numA) || isNaN(numB)) {
+    if (numA === null || numB === null) {
       setValidationError('Operands must be valid numbers.')
       return
     }
 
-    const calcMin = import.meta.env.VITE_CALC_MIN !== undefined
-      ? parseFloat(import.meta.env.VITE_CALC_MIN) : null
-    const calcMax = import.meta.env.VITE_CALC_MAX !== undefined
-      ? parseFloat(import.meta.env.VITE_CALC_MAX) : null
+    const calcMin = parseLimit(import.meta.env.VITE_CALC_MIN)
+    const calcMax = parseLimit(import.meta.env.VITE_CALC_MAX)
 
     if (calcMin !== null && (numA < calcMin || numB < calcMin)) {
       setValidationError(`Operands must be at least ${calcMin}.`)

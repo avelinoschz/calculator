@@ -2,180 +2,86 @@
 
 React + TypeScript UI for the calculator project.
 
-Built with Vite, plain CSS (no UI framework), and tested with Vitest and
-React Testing Library.
-
-## Prerequisites
-
-- Node.js 20+
-- npm
-
-## Quick start
+## Run
 
 ```sh
+make frontend.setup
 make frontend.run
-# or
-cd frontend && npm install && npm run dev
 ```
 
-The dev server starts on `http://localhost:5173`. The backend must be
-running on `:8080` for calculations to work — see
-[`backend/README.md`](../backend/README.md).
+The Vite dev server runs on `http://localhost:5173` and proxies `/api/*` to `http://localhost:8080`.
 
-## Project structure
+## Structure
 
 ```text
 frontend/
-  src/
-    api/
-      calculator.ts           ← typed fetch wrapper, no React imports
-      calculator.test.ts
-    components/
-      CalculatorForm.tsx       ← form with client-side validation
-      CalculatorForm.test.tsx
-    App.tsx                    ← root component; result, error, loading state
-    App.test.tsx
-    main.tsx                   ← ReactDOM.createRoot entry point
-    test/
-      setup.ts                 ← Vitest + Testing Library global setup
-  index.html
-  vite.config.ts               ← build config, dev proxy (/api → :8080), Vitest config
-  Dockerfile                   ← node:20-alpine build → nginx:alpine serve
+  src/api/           typed API client
+  src/components/    form UI and validation
+  src/App.tsx        result, error, and loading state
+  vite.config.ts     Vite, dev proxy, and Vitest config
+  nginx.conf         production nginx config baked into the image
+  Dockerfile         multi-stage frontend image
 ```
-
-Components never import `fetch` directly. All network calls go through
-`src/api/`, keeping UI logic and data fetching independently testable.
 
 ## Configuration
 
-The frontend reads the following Vite environment variables at **build
-time**. They are optional; when absent, no client-side range check is
-performed.
+Optional Vite environment variables:
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `VITE_CALC_MIN` | _(none)_ | Minimum allowed value shown in validation errors |
-| `VITE_CALC_MAX` | _(none)_ | Maximum allowed value shown in validation errors |
+| Variable | Description |
+| --- | --- |
+| `VITE_CALC_MIN` | Minimum operand value for client-side validation |
+| `VITE_CALC_MAX` | Maximum operand value for client-side validation |
 
-A `.env` file at the repository root is sourced automatically by
-`make frontend.run`, which exports `VITE_CALC_*` into the Vite process
-environment. The repository ships with defaults already set:
+`make frontend.run` sources the repository `.env` file automatically
+when present.
 
-```sh
-make frontend.run  # picks up VITE_CALC_MIN=-1000 VITE_CALC_MAX=1000 from .env
-```
+These values are build-time inputs for the browser bundle. They improve
+UX only; the backend remains the authoritative validator.
 
-Because Vite inlines these values at build time, changing them requires
-restarting the dev server (or rebuilding for production). The backend
-is the authoritative validator; frontend limits are a UX convenience
-only.
+## UI Behavior
 
-See [ADR 0004](../docs/adr/0004-environment-variables-for-configuration.md)
-for the rationale behind this approach.
+- API calls are isolated in `src/api/calculator.ts`
+- components do not call `fetch` directly
+- empty inputs are rejected before submission
+- partial garbage like `12abc` is rejected before submission
+- non-finite values such as `Infinity` are rejected before submission
+- backend error messages are surfaced in the UI
 
-## Dev proxy
-
-In development, Vite proxies all `/api/*` requests to `http://localhost:8080`.
-This means the frontend uses relative paths (`/api/v1/calculations`) and
-never hard-codes the backend address.
-
-In Docker Compose, there is no Vite — nginx takes over that role via
-the `nginx.conf` at the repository root, which proxies `/api/` to the
-`backend` service. See [`../nginx.conf`](../nginx.conf) for details.
-
-## Makefile targets
+## Make Targets
 
 | Target | Description |
 | --- | --- |
-| `make frontend.setup` | Install Node dependencies (npm ci) |
-| `make frontend.run` | Run the Vite dev server (port 5173) |
-| `make frontend.test` | Run Vitest (single-run) |
-| `make frontend.coverage` | Run Vitest with coverage report |
+| `make frontend.setup` | Install Node dependencies (`npm ci`) |
+| `make frontend.run` | Run the Vite dev server |
+| `make frontend.test` | Run Vitest |
+| `make frontend.coverage` | Run Vitest with coverage |
 | `make frontend.lint` | Run ESLint |
 | `make frontend.format` | Auto-fix frontend lint issues |
-| `make frontend.build` | Build static assets → `frontend/dist/` |
-| `make frontend.clean` | Remove build artifacts (`frontend/dist/`) |
+| `make frontend.build` | Build `frontend/dist/` |
+| `make frontend.clean` | Remove frontend build artifacts |
 | `make frontend.docker.build` | Build the frontend Docker image |
 
 ## Testing
 
 ```sh
 make frontend.test
-# or
-cd frontend && npx vitest run
-```
-
-Tests are organised across three layers:
-
-- **API layer** (`src/api/`) — plain TypeScript, mocks `fetch` with
-  `vi.stubGlobal`; no React or DOM involved
-- **Component layer** (`src/components/`) — renders components in
-  isolation with React Testing Library; no network calls
-- **Integration** (`App.test.tsx`) — full component tree with mocked
-  fetch; asserts on visible output
-
-## Coverage
-
-```sh
 make frontend.coverage
-# or
-cd frontend && npx vitest run --coverage
-```
-
-Runs the full test suite with V8 coverage and prints a summary table to
-stdout. The coverage report is written to `frontend/coverage/` (includes
-`lcov.info` for CI tooling).
-
-Requires `@vitest/coverage-v8`, which is installed as part of
-`make frontend.setup`.
-
-## Linting
-
-```sh
 make frontend.lint
-# or
-cd frontend && npm run lint
 ```
 
-Uses ESLint with React and TypeScript plugins (configured in
-`eslint.config.js`).
+Tests cover three layers:
 
-## Build
+- API layer
+- component layer
+- full-app integration
+
+## Build and Docker
 
 ```sh
 make frontend.build
-# or
-cd frontend && npm run build
-```
-
-Output: `frontend/dist/`. TypeScript is compiled first, then Vite
-bundles the result.
-
-## Docker
-
-```sh
 make frontend.docker.build
-# or
-docker build -t calculator-frontend ./frontend
 ```
 
-The Dockerfile uses a two-stage build:
-
-- **Stage 1 (`build`)** — `node:20-alpine`; installs dependencies and
-  runs `npm run build`
-- **Stage 2 (`serve`)** — `nginx:alpine`; serves the compiled assets
-  from `/usr/share/nginx/html` on port 80
-
-Run the image standalone (note: API calls will not work without a
-backend and nginx proxy config):
-
-```sh
-docker run -p 3000:80 calculator-frontend
-```
-
-For the full stack with API proxying, use Docker Compose from the
-repository root:
-
-```sh
-make up
-```
+The production image serves static assets with nginx and includes its
+own proxy configuration for `/api/`, so it no longer depends on a
+Compose bind mount.

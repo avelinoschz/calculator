@@ -57,6 +57,42 @@ describe('CalculatorForm', () => {
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
+  it('shows validation error for partial numeric garbage', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = setup()
+
+    await user.type(screen.getByLabelText('First operand'), '12abc')
+    await user.type(screen.getByLabelText('Second operand'), '5')
+    await user.click(screen.getByRole('button', { name: 'Calculate' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Operands must be valid numbers.')
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('shows validation error for whitespace-only input', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = setup()
+
+    await user.type(screen.getByLabelText('First operand'), '   ')
+    await user.type(screen.getByLabelText('Second operand'), '5')
+    await user.click(screen.getByRole('button', { name: 'Calculate' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Both operands are required.')
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('shows validation error for non-finite input', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = setup()
+
+    await user.type(screen.getByLabelText('First operand'), 'Infinity')
+    await user.type(screen.getByLabelText('Second operand'), '5')
+    await user.click(screen.getByRole('button', { name: 'Calculate' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Operands must be valid numbers.')
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
   it('disables the submit button and shows loading text while loading', () => {
     const onSubmit = vi.fn()
     render(<CalculatorForm onSubmit={onSubmit} loading={true} />)

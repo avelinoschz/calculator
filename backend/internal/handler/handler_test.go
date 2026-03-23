@@ -83,6 +83,18 @@ func TestCalculateHandler(t *testing.T) {
 			wantErrorCode: handler.ErrCodeMissingField,
 		},
 		{
+			name:          "missing a field",
+			body:          `{"op":"add","b":2}`,
+			wantStatus:    http.StatusBadRequest,
+			wantErrorCode: handler.ErrCodeMissingField,
+		},
+		{
+			name:          "missing b field",
+			body:          `{"op":"add","a":2}`,
+			wantStatus:    http.StatusBadRequest,
+			wantErrorCode: handler.ErrCodeMissingField,
+		},
+		{
 			name:          "malformed JSON",
 			body:          `{not valid json`,
 			wantStatus:    http.StatusBadRequest,
@@ -91,6 +103,18 @@ func TestCalculateHandler(t *testing.T) {
 		{
 			name:          "empty body",
 			body:          ``,
+			wantStatus:    http.StatusBadRequest,
+			wantErrorCode: handler.ErrCodeInvalidRequest,
+		},
+		{
+			name:          "unexpected extra field",
+			body:          `{"op":"add","a":1,"b":2,"c":3}`,
+			wantStatus:    http.StatusBadRequest,
+			wantErrorCode: handler.ErrCodeInvalidRequest,
+		},
+		{
+			name:          "trailing JSON payload",
+			body:          `{"op":"add","a":1,"b":2}{"op":"subtract","a":2,"b":1}`,
 			wantStatus:    http.StatusBadRequest,
 			wantErrorCode: handler.ErrCodeInvalidRequest,
 		},

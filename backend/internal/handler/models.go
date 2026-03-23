@@ -2,9 +2,9 @@ package handler
 
 // CalculateRequest is the expected request body for POST /api/v1/calculations.
 type CalculateRequest struct {
-	Operation string  `json:"op"`
-	A         float64 `json:"a"`
-	B         float64 `json:"b"`
+	Operation *string  `json:"op"`
+	A         *float64 `json:"a"`
+	B         *float64 `json:"b"`
 }
 
 // CalculateResponse is the success response body.

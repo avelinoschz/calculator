@@ -8,12 +8,13 @@ GO_COVERAGE_FLAGS := -coverprofile=coverage.out -covermode=atomic
 
 export PATH := $(INSTALL_BIN_DIR):$(PATH)
 export GOBIN := $(INSTALL_BIN_DIR)
+export VERSION
 
 .PHONY: help \
 	backend.setup frontend.setup docs.setup setup \
 	backend.run frontend.run run \
 	backend.test frontend.test test \
-	backend.coverage.html frontend.coverage coverage \
+	backend.coverage backend.coverage.html frontend.coverage coverage \
 	backend.lint frontend.lint docs.lint lint \
 	backend.format frontend.format format \
 	backend.build frontend.build build \
@@ -32,8 +33,8 @@ backend.setup: ## Install backend tooling and download Go module dependencies
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
 	cd backend && go mod download
 
-frontend.setup: ## Install Node dependencies and sync lock file (npm install)
-	cd frontend && npm install
+frontend.setup: ## Install Node dependencies (npm ci)
+	cd frontend && npm ci
 
 docs.setup: ## Install docs tooling (markdownlint-cli)
 	npm ci
@@ -63,13 +64,16 @@ test: backend.test frontend.test ## Run all tests
 
 # ── Coverage ──────────────────────────────────────────────────────────────────
 
-backend.coverage.html: ## Run Go tests and generate coverage.html for browser viewing
-	cd backend && go test $(GO_TEST_FLAGS) $(GO_COVERAGE_FLAGS) ./... && go tool cover -html=coverage.out -o coverage.html
+backend.coverage: ## Run Go tests with coverage profile output
+	cd backend && go test $(GO_TEST_FLAGS) $(GO_COVERAGE_FLAGS) ./...
+
+backend.coverage.html: backend.coverage ## Generate backend/coverage.html for browser viewing
+	cd backend && go tool cover -html=coverage.out -o coverage.html
 
 frontend.coverage: ## Run Vitest with coverage report (text + lcov)
 	cd frontend && npx vitest run --coverage
 
-coverage: backend.test frontend.coverage ## Run all tests with coverage reports
+coverage: backend.coverage frontend.coverage ## Run all tests with coverage reports
 
 # ── Lint ──────────────────────────────────────────────────────────────────────
 
@@ -107,10 +111,13 @@ build: backend.build frontend.build ## Build backend binary and frontend assets
 # ── Docker ────────────────────────────────────────────────────────────────────
 
 backend.docker.build: ## Build the backend Docker image
-	docker build -t calculator-backend ./backend
+	docker build --build-arg VERSION=$(VERSION) -t calculator-backend ./backend
 
 frontend.docker.build: ## Build the frontend Docker image
-	docker build -t calculator-frontend ./frontend
+	docker build \
+		--build-arg VITE_CALC_MIN=$(VITE_CALC_MIN) \
+		--build-arg VITE_CALC_MAX=$(VITE_CALC_MAX) \
+		-t calculator-frontend ./frontend
 
 docker.build: backend.docker.build frontend.docker.build ## Build all Docker images
 

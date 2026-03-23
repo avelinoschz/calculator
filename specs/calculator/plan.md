@@ -2,13 +2,18 @@
 
 ## Overview
 
-This document describes the execution plan for the calculator project.
+This document records the historical implementation plan that guided
+development of the calculator project.
 
-Its purpose is to translate requirements and design decisions into a
-realistic delivery strategy.
+It was used as part of a spec-driven, AI-assisted workflow: define the
+requirements and contract first, then execute the work in explicit,
+reviewable phases.
 
-This plan derives from `specs/calculator/requirements.md`. The API
-contract described here should be validated against `api/openapi.yaml`.
+This file records the historical implementation process. Current
+runtime behavior is still governed by:
+
+- `specs/calculator/requirements.md`
+- `api/openapi.yaml`
 
 ## Delivered State
 
@@ -17,43 +22,41 @@ fully functional and includes:
 
 - Go backend with domain/handler separation, structured logging,
   graceful shutdown, and version embedding
-- React + TypeScript frontend with isolated API layer, three-layer tests,
-  and responsive plain-CSS styling
+- React + TypeScript frontend with isolated API layer, three-layer
+  tests, and responsive plain-CSS styling
 - `POST /api/v1/calculations` and `GET /health` endpoints
-- Consistent JSON error responses with typed error codes
-- Multi-stage Dockerfiles (distroless backend, nginx frontend)
-- Docker Compose with nginx API proxy
-- Makefile with setup, run, test, lint, format, build, and Docker targets
-- GitHub Actions CI (lint, test, build for both services)
+- consistent JSON error responses with typed error codes
+- multi-stage Dockerfiles and Docker Compose
+- Makefile workflows for setup, run, test, coverage, lint, format,
+  build, and Docker tasks
+- GitHub Actions CI for lint, test, and build
+- supporting ADRs and AI-usage documentation
 
-The plan prioritizes:
+The purpose of this plan was to keep the work:
 
-- core completeness
-- maintainability
-- testability
-- reviewer experience
-- disciplined scope control
+- phased
+- reviewable
+- constrained by scope
+- aligned with the requirements and API contract
 
 ## Delivery Strategy
 
-The project should be implemented in small, sequential phases.
+The system was intentionally implemented in small sequential phases.
 
-Each phase should produce something concrete and reviewable.
+The core rule during development was:
 
-The core rule is:
+> complete the required end-to-end path before investing in optional
+> polish or extras.
 
-> finish the required path end-to-end before investing in optional
-> enhancements.
-
-This means the project should first become:
+That meant the project needed to become, in order:
 
 - functionally correct
+- easy to test
 - easy to run
 - easy to review
-- reasonably tested
 
-Only after that should optional polish or production-minded extras be
-added.
+Only after that were tooling, delivery polish, and documentation
+expanded.
 
 ## Implementation Phases
 
@@ -61,174 +64,176 @@ added.
 
 ### Phase 0 Goal
 
-Ensure requirements, design decisions, and API contract are clear before
-implementation starts.
+Make the scope, contract, and priorities explicit before implementation
+begins.
 
 ### Phase 0 Deliverables
 
 - `specs/calculator/requirements.md`
-- `docs/adr/0001-architecture-and-api.md`
-- `docs/adr/0002-tooling-and-delivery.md`
 - `specs/calculator/api.md`
 - `api/openapi.yaml`
+- `docs/adr/0001-architecture-and-api.md`
+- `docs/adr/0002-tooling-and-delivery.md`
 - `specs/calculator/plan.md`
-- `AGENTS.md` — AI collaboration guidance (added beyond original scope)
+- `AGENTS.md`
 
 ### Phase 0 Exit Criteria
 
-- Core scope is clearly defined
+- core scope is explicit
 - API contract is stable enough to implement
-- Priorities and de-scope rules are explicit
+- de-scope rules are defined
+- AI collaboration constraints are written down before coding starts
 
 ## Phase 1 — Backend Core [COMPLETED]
 
 ### Phase 1 Goal
 
-Build the smallest correct backend that supports the required
-calculator operations.
+Build the smallest correct backend that satisfies the required
+calculator operations and error handling model.
 
 ### Phase 1 Tasks
 
-- Create Go module and backend project structure
-- Implement calculator domain logic separate from HTTP handlers
-- Define request and response models
-- Implement `POST /api/v1/calculations`
-- Add request validation
-- Add consistent JSON error responses
-- Add structured logging with `log/slog`
-- Add backend unit tests for core logic
-- Add selected handler tests where they add value
+- create the Go module and backend structure
+- keep calculator domain logic independent from HTTP handlers
+- implement `GET /health`
+- implement `POST /api/v1/calculations`
+- validate request payloads explicitly
+- return consistent JSON error responses
+- add structured logging with `log/slog`
+- add graceful shutdown handling
+- add unit tests for domain logic
+- add targeted handler tests for request/response behavior
 
 ### Phase 1 Exit Criteria
 
-- All 4 core operations work
-- Invalid requests are handled correctly
-- Division by zero is handled correctly
-- Tests pass
-- Backend can be run locally
+- all four core operations work
+- invalid requests are handled correctly
+- division by zero is handled correctly
+- tests pass
+- backend can run locally
 
 ### Phase 1 Deliverables
 
-- Go backend with domain logic separated from HTTP handlers
-- `GET /health` and `POST /api/v1/calculations` endpoints
-- Request validation and consistent JSON error responses
-- Structured logging with `log/slog`
-- Graceful shutdown on `SIGINT` / `SIGTERM`
-- Unit tests for domain logic and HTTP handlers
+- calculator domain package
+- HTTP handler package
+- health and calculation endpoints
+- structured logging
+- graceful shutdown
+- backend unit and handler tests
 
 ## Phase 2 — Frontend Core [COMPLETED]
 
 ### Phase 2 Goal
 
-Build a minimal but clear UI that consumes the backend API.
+Build a minimal UI that consumes the backend cleanly and mirrors the
+same separation-of-concerns principles.
 
 ### Phase 2 Tasks
 
-- Scaffold React + TypeScript frontend
-- Build calculator form with operand inputs and operation selector
-- Add submit action
-- Call backend API
-- Show result state
-- Show error state
-- Add client-side validation
-- Add basic component or interaction tests
-- Add basic responsive layout support
+- scaffold React + TypeScript frontend with Vite
+- build calculator form with operand inputs and operation selector
+- add submit flow
+- isolate API calls in `src/api/`
+- show loading, result, and error states
+- add client-side validation before submission
+- add basic responsive styling
+- add tests at API, component, and integration layers
 
 ### Phase 2 Exit Criteria
 
-- A user can perform all core operations from the UI
-- Invalid input is surfaced clearly
-- Backend errors are surfaced clearly
-- Frontend can be run locally
+- a user can perform all core operations from the UI
+- invalid input is surfaced clearly
+- backend errors are surfaced clearly
+- frontend can run locally
 
 ### Phase 2 Deliverables
 
-- React + TypeScript frontend scaffolded with Vite
-- Calculator form with operand inputs, operation selector, and client-side validation
-- API layer isolated from UI components; dev proxy to backend
-- Result and error state displayed clearly
-- Responsive layout with plain CSS
-- Unit and integration tests across API layer, component layer, and full app
-- Frontend Dockerfile (build + serve)
-- `docs/adr/0003-frontend-architecture.md` (added beyond original scope)
+- Vite-based React frontend
+- isolated API client
+- validated calculator form
+- result and error rendering
+- responsive plain CSS
+- three-layer frontend tests
 
 ## Phase 3 — Developer Experience and Quality Gates [COMPLETED]
 
 ### Phase 3 Goal
 
-Make the project easy to run, test, lint, and review.
+Make the project easy to run, test, lint, build, and evaluate.
 
 ### Phase 3 Tasks
 
-- Add `Makefile`
-- Add linting configuration
-- Add backend Dockerfile using multi-stage build
-- Add frontend Dockerfile
-- Add Docker Compose for full-stack execution
-- Add basic GitHub Actions workflow for lint, test, and build
-
-### Phase 3 Make Targets (delivered)
-
-- `make setup` / `make backend.setup` / `make frontend.setup` / `make docs.setup`
-- `make run` / `make backend.run` / `make frontend.run`
-- `make test` / `make backend.test` / `make frontend.test`
-- `make lint` / `make backend.lint` / `make frontend.lint` / `make docs.lint`
-- `make format` / `make backend.format` / `make frontend.format`
-- `make build` / `make backend.build` / `make frontend.build`
-- `make docker.build` / `make backend.docker.build` / `make frontend.docker.build`
-- `make up` / `make down`
+- add a Makefile for common workflows
+- pin backend tooling locally
+- add backend and frontend Dockerfiles
+- add Docker Compose for the full stack
+- add CI for lint, test, and build
+- keep local and CI commands aligned
 
 ### Phase 3 Exit Criteria
 
-- Common workflows are available via Makefile
-- Full stack can be started with Docker Compose
-- Basic lint/test/build workflow is codified
+- common workflows are available through the Makefile
+- the full stack can be started through Docker Compose
+- CI covers the main quality gates
+
+### Phase 3 Make Targets
+
+- `make setup`
+- `make run`
+- `make test`
+- `make coverage`
+- `make lint`
+- `make format`
+- `make build`
+- `make docker.build`
+- `make up`
+- `make down`
 
 ## Phase 4 — Documentation and Delivery Polish [COMPLETED]
 
 ### Phase 4 Goal
 
-Make the project easy to understand and review.
+Make the repository understandable to a reviewer without requiring a
+deep code read first.
 
 ### Phase 4 Tasks
 
-- Write or refine README
-- Add local run instructions
-- Add Docker run instructions
-- Add API usage examples
-- Add design rationale summary
-- Add trade-offs and future improvements
-- Verify file structure and naming consistency
-- Remove dead code or unnecessary complexity
-
-### Phase 4 Extra Deliverables
-
-- `docs/ai-prompts.md` — representative AI prompts used during development
+- write or refine root and service READMEs
+- document API behavior and examples
+- capture architecture and tooling decisions in ADRs
+- document the AI-assisted workflow and representative prompts
+- trim obvious redundancy
+- keep documentation aligned with implementation
 
 ### Phase 4 Exit Criteria
 
-- Reviewers can run the project quickly
-- Reviewers can understand the design without reading the entire
-  codebase first
-- Trade-offs are explicit
+- a reviewer can run the project quickly
+- the main design decisions are visible without reading the whole codebase
+- AI usage is documented as part of the project history
+
+### Phase 4 Extra Deliverables
+
+- `docs/adr/0003-frontend-architecture.md`
+- `docs/adr/0004-environment-variables-for-configuration.md`
+- `docs/ai-prompts.md`
 
 ## De-scope Rules
 
-If constraints require de-scoping, reduce scope in this order:
+If time or complexity forced scope reduction, cut work in this order:
 
-1. Skip optional calculator operations
-2. Skip advanced observability
-3. Keep Docker Compose, but avoid extra container polish
-4. Keep CI minimal
-5. Keep frontend styling minimal
-6. Do not cut core validation, tests, or README before cutting optional
-   extras
+1. skip optional calculator operations
+2. skip advanced observability
+3. keep Docker Compose but avoid extra polish
+4. keep CI minimal
+5. keep frontend styling minimal
+6. do not cut validation, tests, or core documentation before cutting
+   optional extras
 
 ### Hard Rule
 
 Do not sacrifice:
 
-- correctness of the 4 required operations
+- correctness of the four required operations
 - clear validation and error handling
 - testability
 - readability
@@ -237,29 +242,40 @@ Do not sacrifice:
 
 ### Main Risks
 
-- Spending too much time on tooling before the core works
-- Overengineering project structure
-- Adding optional features too early
-- Losing time in frontend polish beyond what is needed
-- Expanding Docker/CI/observability beyond the project's needs
+- spending too much time on tooling before the core works
+- overengineering the project structure
+- adding optional features too early
+- letting frontend polish outrun backend completeness
+- producing documentation that explains too much but guides too little
 
 ### Mitigations
 
-- Build backend core first
-- Keep a single API endpoint
-- Keep frontend intentionally simple
-- Add tooling only after the end-to-end path works
-- Use the plan as the source of priority decisions
+- start with the backend core
+- keep a single calculation endpoint
+- keep frontend state and styling simple
+- use the plan to sequence the work deliberately
+- treat requirements and OpenAPI as the contract anchors
 
 ## Definition of Done
 
-The project is considered done when:
+The project was considered done when:
 
-- the 4 required operations work end-to-end
-- frontend and backend validation are implemented
-- errors are handled consistently
-- the code is readable and reasonably structured
-- unit tests cover key functionality
-- the API contract is documented
-- the README is sufficient for setup and usage
-- the project can be run locally with clear commands
+- the four required operations worked end to end
+- frontend and backend validation were implemented
+- error responses were consistent
+- tests covered the main behavior
+- lint, test, and build workflows existed
+- Docker Compose could run the full stack
+- documentation made the design and workflow reviewable
+
+## Relationship to AI Workflow
+
+This plan and `docs/ai-prompts.md` serve different purposes:
+
+- `specs/calculator/plan.md` records the phased execution strategy used
+  during development
+- `docs/ai-prompts.md` records representative prompt patterns used to
+  execute that strategy with AI assistance
+
+Together they document the spec-driven development process used for the
+project.

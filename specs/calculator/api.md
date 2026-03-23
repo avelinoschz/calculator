@@ -1,49 +1,22 @@
 # API Contract
 
-## Overview
-
-The backend exposes a minimal REST API for calculator operations.
-
-The contract is intentionally small:
-
-- two endpoints (calculator + health check)
-- one request shape
-- one success shape
-- one error shape
-
-This keeps the API easy to implement, test, and consume from the
-frontend.
-
-This document is a human-readable guide to the API. The canonical
-machine-readable contract lives in `api/openapi.yaml`. If there is any
-discrepancy, `api/openapi.yaml` prevails.
+Human-readable guide for the calculator API. The canonical contract is [`api/openapi.yaml`](../../api/openapi.yaml).
 
 ## Endpoints
 
 ### `GET /health`
 
-Returns the liveness status of the server.
-
-#### Health Response
+Response:
 
 ```json
-{"status": "ok"}
+{
+  "status": "ok"
+}
 ```
-
-Always returns `200 OK` while the server is running. No request body or
-parameters required.
 
 ### `POST /api/v1/calculations`
 
-Executes a calculator operation using two numeric operands.
-
-## Request
-
-### Content-Type
-
-`application/json`
-
-### Request Body
+Request:
 
 ```json
 {
@@ -53,28 +26,14 @@ Executes a calculator operation using two numeric operands.
 }
 ```
 
-### Request Fields
-
-| Field       | Type     | Required | Description          |
-| ----------- | -------- | -------- | -------------------- |
-| `op`        | `string` | Yes      | Operation to execute |
-| `a`         | `number` | Yes      | First operand        |
-| `b`         | `number` | Yes      | Second operand       |
-
-### Allowed Operations
+Supported operations:
 
 - `add`
 - `subtract`
 - `multiply`
 - `divide`
 
-## Success Response
-
-### Success Status
-
-`200 OK`
-
-### Success Body
+Success:
 
 ```json
 {
@@ -82,22 +41,7 @@ Executes a calculator operation using two numeric operands.
 }
 ```
 
-### Success Fields
-
-| Field    | Type     | Description     |
-| -------- | -------- | --------------- |
-| `result` | `number` | Computed result |
-
-## Error Response
-
-All API errors return a consistent JSON structure.
-
-Errors in the domain layer (`calculator` package) are defined as sentinel
-errors (`ErrInvalidOperation`, `ErrDivisionByZero`). The HTTP handler maps
-them to the appropriate status code and error body using `errors.Is`, keeping
-domain logic decoupled from transport concerns.
-
-### Error Body
+Error:
 
 ```json
 {
@@ -108,151 +52,36 @@ domain logic decoupled from transport concerns.
 }
 ```
 
-### Error Fields
-
-- `error.code` (`string`): machine-readable error code
-- `error.message` (`string`): human-readable error message
-
 ## Status Codes
 
-- `200 OK`: successful calculation
-- `400 Bad Request`: invalid payload, malformed JSON, missing fields,
-  or invalid operation
-- `422 Unprocessable Entity`: mathematically invalid request, such as
-  division by zero
-- `500 Internal Server Error`: unexpected server-side error
+- `200 OK` — successful calculation
+- `400 Bad Request` — malformed JSON, extra fields, trailing payload,
+  missing field, or invalid operation
+- `422 Unprocessable Entity` — division by zero or operand outside
+  configured limits
+- `500 Internal Server Error` — unexpected server-side failure
 
 ## Error Codes
 
-The set of error codes should remain small and predictable. Refer to
-`api/openapi.yaml` for the canonical response contract.
-
-- `INVALID_REQUEST`: request body could not be parsed or failed basic
-  validation
-- `INVALID_OPERATION`: operation is not supported
-- `MISSING_FIELD`: a required field is missing
-- `INVALID_NUMBER`: one or more operands are invalid
-- `DIVISION_BY_ZERO`: division by zero is not allowed
-- `INTERNAL_ERROR`: unexpected internal server error
+- `INVALID_REQUEST` — malformed JSON, unknown field, or trailing payload
+- `MISSING_FIELD` — `op`, `a`, or `b` is absent
+- `INVALID_OPERATION` — unsupported `op`
+- `DIVISION_BY_ZERO` — `op=divide` and `b=0`
+- `OPERAND_OUT_OF_RANGE` — `a` or `b` is outside configured backend
+  limits
+- `INTERNAL_ERROR` — unexpected server-side failure
 
 ## Validation Rules
 
-### Request Validation
+- request body must be valid JSON
+- request body must contain only `op`, `a`, and `b`
+- request body must contain exactly one JSON object
+- `op`, `a`, and `b` are required
+- `op` must be one of the four supported operations
+- backend operand limits are enforced after request validation
 
-- Request body must be valid JSON
-- `op` must be one of:
-  - `add`
-  - `subtract`
-  - `multiply`
-  - `divide`
-- `a` must be a valid number
-- `b` must be a valid number
+## Notes
 
-### Business Validation
-
-- `divide` must reject `b = 0`
-
-## Examples
-
-### Addition
-
-#### Addition Request
-
-```json
-{
-  "op": "add",
-  "a": 10,
-  "b": 5
-}
-```
-
-#### Addition Response
-
-```json
-{
-  "result": 15
-}
-```
-
-### Division
-
-#### Division Request
-
-```json
-{
-  "op": "divide",
-  "a": 20,
-  "b": 4
-}
-```
-
-#### Division Response
-
-```json
-{
-  "result": 5
-}
-```
-
-### Invalid Operation
-
-#### Invalid Operation Request
-
-```json
-{
-  "op": "power",
-  "a": 2,
-  "b": 3
-}
-```
-
-#### Invalid Operation Response
-
-```json
-{
-  "error": {
-    "code": "INVALID_OPERATION",
-    "message": "operation must be one of add, subtract, multiply, divide"
-  }
-}
-```
-
-### Division by Zero
-
-#### Division by Zero Request
-
-```json
-{
-  "op": "divide",
-  "a": 10,
-  "b": 0
-}
-```
-
-#### Division by Zero Response
-
-```json
-{
-  "error": {
-    "code": "DIVISION_BY_ZERO",
-    "message": "division by zero is not allowed"
-  }
-}
-```
-
-## Contract Design Notes
-
-### Why a single endpoint?
-
-A single calculations endpoint keeps the API small and avoids
-unnecessary duplication across multiple operation-specific routes.
-
-### Why a consistent error shape?
-
-A stable error model simplifies frontend integration and improves
-maintainability.
-
-### Why binary operands only?
-
-The required scope only includes binary operations, which keeps the
-contract simple and focused.
+- The backend is the source of truth for validation.
+- The frontend mirrors some of this validation for UX, but backend
+  responses define the final contract.
