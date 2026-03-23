@@ -27,7 +27,8 @@ well-structured, and production-minded solution.
 - `specs/calculator/plan.md` describes the intended implementation sequence.
 - `specs/calculator/api.md` is the human-readable API guide.
 - `api/openapi.yaml` is the canonical API contract.
-- `docs/adr/0001-architecture-and-api.md` captures backend architecture and API design decisions.
+- `docs/adr/0001-architecture-and-api.md` captures backend architecture
+  and API design decisions.
 - `docs/adr/0002-tooling-and-delivery.md` captures tooling and delivery decisions.
 - `docs/adr/0003-frontend-architecture.md` captures frontend architecture decisions.
 - `AGENTS.md` provides implementation guidance for AI-assisted workflows.
@@ -152,15 +153,22 @@ per-service commands.
 
 ## Design Summary
 
-- **Single endpoint** (`POST /api/v1/calculations`) — one stable API surface; operation type is a request field, not a route.
-- **Separated layers** — calculator domain logic (`internal/calculator`) is independent of HTTP handlers; testable without network.
-- **Dual validation** — frontend validates for UX; backend is the authoritative source and always validates.
-- **Standard library only** — Go `net/http` and `log/slog`; no frameworks needed at this scale.
-- **Isolated API layer** — frontend `src/api/` is decoupled from UI components and mocked independently in tests.
+- **Single endpoint** (`POST /api/v1/calculations`) — one stable API
+  surface; operation type is a request field, not a route.
+- **Separated layers** — calculator domain logic (`internal/calculator`)
+  is independent of HTTP handlers; testable without network.
+- **Dual validation** — frontend validates for UX; backend is the
+  authoritative source and always validates.
+- **Standard library only** — Go `net/http` and `log/slog`; no frameworks
+  needed at this scale.
+- **Isolated API layer** — frontend `src/api/` is decoupled from UI
+  components and mocked independently in tests.
 
-Full rationale in [`docs/adr/0001-architecture-and-api.md`](docs/adr/0001-architecture-and-api.md),
-[`docs/adr/0002-tooling-and-delivery.md`](docs/adr/0002-tooling-and-delivery.md), and
-[`docs/adr/0003-frontend-architecture.md`](docs/adr/0003-frontend-architecture.md).
+Full rationale in the ADRs:
+
+- [Architecture and API](docs/adr/0001-architecture-and-api.md)
+- [Tooling and Delivery](docs/adr/0002-tooling-and-delivery.md)
+- [Frontend Architecture](docs/adr/0003-frontend-architecture.md)
 
 ## Trade-offs
 
