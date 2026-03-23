@@ -97,6 +97,22 @@ Rationale:
 - Eliminates CORS issues during local development without backend changes
 - In production, the proxy is replaced by the nginx container's network routing
 
+### 9. Use CSS custom properties with fluid `clamp()` values for responsive design
+
+All design tokens (colors, font sizes, spacing, layout dimensions) are declared
+as CSS custom properties in the `:root` block of `App.css`. Fluid values use
+`clamp(minimum, preferred-vw, maximum)` so the layout scales continuously with
+the viewport without breakpoints.
+
+Rationale:
+
+- All tuning knobs are in one place; changing a value updates every element that
+  references it
+- `clamp()` produces smooth, continuous scaling instead of discrete breakpoint
+  jumps
+- No JavaScript or framework feature needed — pure CSS
+- Meets the requirements' basic responsive design criterion with minimal complexity
+
 ### 8. Use TypeScript strict mode
 
 `tsconfig.json` enables `"strict": true`.
@@ -118,7 +134,7 @@ Rationale:
 ### Trade-offs
 
 - No server-side rendering or code splitting for larger apps
-- Plain CSS requires manual responsive work
+- Plain CSS with no utility framework; all responsive behaviour is hand-authored
 - No global state management if scope expands significantly
 
 ## Notes
