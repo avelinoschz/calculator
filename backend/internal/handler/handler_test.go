@@ -15,11 +15,11 @@ import (
 
 func TestCalculateHandler(t *testing.T) {
 	tests := []struct {
-		name           string
-		body           string
-		wantStatus     int
-		wantResult     *float64
-		wantErrorCode  string
+		name          string
+		body          string
+		wantStatus    int
+		wantResult    *float64
+		wantErrorCode string
 	}{
 		{
 			name:       "add two numbers",

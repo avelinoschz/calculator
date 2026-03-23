@@ -11,11 +11,11 @@ import (
 
 func TestCalculate(t *testing.T) {
 	tests := []struct {
-		name      string
-		op        calculator.Operation
-		a, b      float64
-		want      float64
-		wantErr   error
+		name    string
+		op      calculator.Operation
+		a, b    float64
+		want    float64
+		wantErr error
 	}{
 		// Addition
 		{name: "add positive numbers", op: calculator.OperationAdd, a: 10, b: 5, want: 15},
