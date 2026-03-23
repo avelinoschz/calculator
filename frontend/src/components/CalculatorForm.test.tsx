@@ -57,10 +57,24 @@ describe('CalculatorForm', () => {
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
-  it('disables the submit button while loading', () => {
+  it('disables the submit button and shows loading text while loading', () => {
     const onSubmit = vi.fn()
     render(<CalculatorForm onSubmit={onSubmit} loading={true} />)
-    expect(screen.getByRole('button')).toBeDisabled()
+    const button = screen.getByRole('button')
+    expect(button).toBeDisabled()
+    expect(button).toHaveTextContent('Calculating…')
+  })
+
+  it('calls onSubmit with selected operation', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = setup()
+
+    await user.type(screen.getByLabelText('First operand'), '3')
+    await user.type(screen.getByLabelText('Second operand'), '4')
+    await user.selectOptions(screen.getByLabelText('Operation'), 'multiply')
+    await user.click(screen.getByRole('button', { name: 'Calculate' }))
+
+    expect(onSubmit).toHaveBeenCalledWith('multiply', 3, 4)
   })
 })
 

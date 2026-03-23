@@ -18,6 +18,20 @@ func noLimitsHandler() *handler.Handler {
 	return &handler.Handler{Min: math.Inf(-1), Max: math.Inf(1)}
 }
 
+func TestHealth(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/health", nil)
+	rec := httptest.NewRecorder()
+
+	handler.Health(rec, req)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Equal(t, "application/json", rec.Header().Get("Content-Type"))
+
+	var resp map[string]string
+	require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
+	assert.Equal(t, "ok", resp["status"])
+}
+
 func TestCalculateHandler(t *testing.T) {
 	tests := []struct {
 		name          string
