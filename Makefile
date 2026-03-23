@@ -31,8 +31,8 @@ backend.setup: ## Install backend tooling and download Go module dependencies
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
 	cd backend && go mod download
 
-frontend.setup: ## Install Node dependencies (npm ci)
-	cd frontend && npm ci
+frontend.setup: ## Install Node dependencies and sync lock file (npm install)
+	cd frontend && npm install
 
 docs.setup: ## Install docs tooling (markdownlint-cli)
 	npm ci
