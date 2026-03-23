@@ -132,7 +132,86 @@ Basic responsive layout for mobile
 Start by reading the spec files listed above, then plan before implementing.
 ```
 
-## 3. Reviewer Prompt
+## 3. Tooling and Delivery Prompt
+
+Used this prompt to implement the developer-experience and quality-gate
+phase after both backend and frontend core functionality were already in
+place.
+
+Its purpose was to keep the final project setup aligned with the
+documented delivery requirements: simple developer workflows, Docker
+support, CI checks, and minimal tooling that improved reliability
+without expanding scope.
+
+This prompt was most useful once the application code and API behavior
+were already stable, since it explicitly focused on Make targets,
+containerization, and automation rather than product features.
+
+```text
+This is a full-stack calculator project. The repository is at /Users/avelino/repos/github.com/avelinoschz/calculator.
+
+Phases 1 (Go backend) and 2 (React frontend) are complete. Read the following
+files before doing anything:
+
+  AGENTS.md                          — implementation rules and priorities
+  specs/calculator/requirements.md   — scope and acceptance criteria
+  specs/calculator/plan.md           — phased delivery plan
+
+What is already built:
+
+  backend/
+    cmd/server/main.go                  ← entry point, graceful shutdown
+    internal/calculator/calculator.go   ← domain logic, sentinel errors
+    internal/calculator/calculator_test.go
+    internal/handler/handler.go         ← HTTP handlers (GET /health, POST /api/v1/calculations)
+    internal/handler/handler_test.go
+    internal/handler/models.go
+    go.mod / go.sum
+
+  frontend/
+    src/api/calculator.ts               ← fetch client, isolated from UI
+    src/components/CalculatorForm.tsx   ← form with client-side validation
+    src/App.tsx                         ← root component
+    src/main.tsx
+    src/App.css
+    index.html
+    package.json / tsconfig.json
+    vite.config.ts                      ← dev proxy /api → :8080, Vitest config
+    Dockerfile                          ← node:20-alpine build → nginx:alpine serve
+
+The backend runs on :8080. The frontend dev server runs on :5173 and proxies
+/api to the backend. The frontend Dockerfile already exists.
+
+Your task
+
+Implement Phase 3 — Developer Experience and Quality Gates — as described in
+specs/calculator/plan.md.
+
+The expected Makefile targets are:
+
+  make help
+  make backend.run
+  make frontend.run
+  make test
+  make lint
+  make build
+  make docker.build
+  make up
+  make down
+
+Key constraints:
+
+  - The backend Dockerfile must use a multi-stage build (build stage + minimal
+    runtime image such as distroless or alpine)
+  - Docker Compose must orchestrate both frontend and backend together
+  - The GitHub Actions workflow must run lint, test, and build
+  - The frontend Dockerfile already exists — do not recreate it
+  - Do not change any backend or frontend source code
+
+Start by reading the spec files listed above, then plan before implementing.
+```
+
+## 4. Reviewer Prompt
 
 Use this prompt after a meaningful implementation step, such as backend
 core, frontend core, or a final review pass.
