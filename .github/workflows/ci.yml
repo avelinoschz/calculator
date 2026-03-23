@@ -23,10 +23,13 @@ jobs:
       - name: Download modules
         run: go mod download
 
+      - name: Setup backend tools
+        working-directory: .
+        run: make backend.setup
+
       - name: Lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          working-directory: backend
+        working-directory: .
+        run: make backend.lint
 
       - name: Test
         run: go test ./...
