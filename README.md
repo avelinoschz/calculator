@@ -66,65 +66,72 @@ See:
 
 ## How to Run
 
-### Backend
+### Quick start — local dev
+
+Prerequisites: Go 1.21+, Node.js 20+, npm.
 
 ```sh
-cd backend
-go run ./cmd/server/
+make run          # starts backend (:8080) and frontend (:5173) in parallel
 ```
 
-The server starts on `http://localhost:8080`.
+Or start each service individually:
 
-Check the server is up:
+```sh
+make backend.run  # Go server on http://localhost:8080
+make frontend.run # Vite dev server on http://localhost:5173
+```
+
+All frontend API requests are proxied to `:8080` by the Vite dev server.
+
+### Quick start — Docker Compose
+
+Prerequisites: Docker with Compose v2.
+
+```sh
+make up   # builds images and starts the full stack
+make down # stops all containers
+```
+
+The frontend is served by nginx on `http://localhost:80`. API requests to
+`/api/` are proxied to the backend container.
+
+### Verify the backend
 
 ```sh
 curl http://localhost:8080/health
 # {"status":"ok"}
-```
 
-Run a calculation:
-
-```sh
 curl -s -X POST http://localhost:8080/api/v1/calculations \
   -H "Content-Type: application/json" \
   -d '{"op":"add","a":10,"b":5}'
 # {"result":15}
 ```
 
-Makefile targets and Docker Compose support will be added in a later phase.
-
-### Frontend
-
-Prerequisites: Node.js 20+ and npm.
+### All Makefile targets
 
 ```sh
-cd frontend
-npm install
-npm run dev
+make help
 ```
 
-The dev server starts on `http://localhost:5173`.
-
-All API requests are proxied to `http://localhost:8080`. The backend must
-be running for calculations to work.
-
-Run the tests:
-
-```sh
-npm test
-```
-
-To build and run the frontend with Docker:
-
-```sh
-docker build -t calculator-frontend ./frontend
-docker run -p 3000:80 calculator-frontend
-```
-
-The container serves the static build via nginx on port 80, mapped to
-`http://localhost:3000`.
-
-Makefile targets and Docker Compose support will be added in a later phase.
+| Target | Description |
+| --- | --- |
+| `make run` | Run backend and frontend locally in parallel |
+| `make backend.run` | Run the Go backend (port 8080) |
+| `make frontend.run` | Run the Vite dev server (port 5173) |
+| `make test` | Run all tests |
+| `make backend.test` | Run Go tests |
+| `make frontend.test` | Run Vitest (single-run) |
+| `make lint` | Run all linters |
+| `make backend.lint` | Run golangci-lint |
+| `make frontend.lint` | Run ESLint |
+| `make build` | Build backend binary and frontend assets |
+| `make backend.build` | Build Go binary → `backend/bin/server` |
+| `make frontend.build` | Build frontend static assets → `frontend/dist/` |
+| `make docker.build` | Build all Docker images |
+| `make backend.docker.build` | Build the backend Docker image |
+| `make frontend.docker.build` | Build the frontend Docker image |
+| `make up` | Start the full stack with Docker Compose |
+| `make down` | Stop the full stack |
 
 ## Project Structure
 
@@ -134,6 +141,8 @@ backend/
   internal/
     calculator/       ← domain logic, sentinel errors, unit tests
     handler/          ← HTTP handlers, request/response models, handler tests
+  Dockerfile          ← golang:alpine build stage → distroless runtime stage
+  .golangci.yml       ← golangci-lint configuration
 ```
 
 ```text
@@ -146,6 +155,14 @@ frontend/
   index.html
   vite.config.ts      ← build config, dev proxy (/api → :8080), Vitest config
   Dockerfile          ← node:20-alpine build stage → nginx:alpine serve stage
+```
+
+```text
+Makefile              ← common developer targets (run, test, lint, build, docker, compose)
+docker-compose.yml    ← orchestrates backend + frontend containers
+nginx.conf            ← nginx proxy config for Docker Compose (proxies /api/ to backend)
+.github/workflows/
+  ci.yml              ← GitHub Actions: lint, test, build (backend and frontend jobs)
 ```
 
 The key separation of concerns: components never import fetch directly.
@@ -161,5 +178,6 @@ Key design decisions are documented in:
 
 ## Notes
 
-This repository intentionally prioritizes clear scope, maintainable
-design, and pragmatic decision-making before implementation begins.
+This project intentionally prioritizes clear scope, maintainable design,
+and correctness over feature volume. See `AGENTS.md` for implementation
+guidance and priorities.
