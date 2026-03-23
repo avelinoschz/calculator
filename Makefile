@@ -9,10 +9,10 @@ export PATH := $(INSTALL_BIN_DIR):$(PATH)
 export GOBIN := $(INSTALL_BIN_DIR)
 
 .PHONY: help \
-	backend.setup frontend.setup setup \
+	backend.setup frontend.setup docs.setup setup \
 	backend.run frontend.run run \
 	backend.test frontend.test test \
-	backend.lint frontend.lint lint \
+	backend.lint frontend.lint docs.lint lint \
 	backend.format frontend.format format \
 	backend.build frontend.build build \
 	backend.clean frontend.clean clean \
@@ -32,7 +32,10 @@ backend.setup: ## Install backend tooling and download Go module dependencies
 frontend.setup: ## Install Node dependencies (npm ci)
 	cd frontend && npm ci
 
-setup: backend.setup frontend.setup ## Bootstrap local environment (tools + dependencies)
+docs.setup: ## Install docs tooling (markdownlint-cli)
+	npm ci
+
+setup: backend.setup frontend.setup docs.setup ## Bootstrap local environment (tools + dependencies)
 
 # ── Run ───────────────────────────────────────────────────────────────────────
 
@@ -63,7 +66,10 @@ backend.lint: ## Run golangci-lint
 frontend.lint: ## Run ESLint
 	cd frontend && npm run lint
 
-lint: backend.lint frontend.lint ## Run all linters
+docs.lint: ## Run markdownlint on all markdown files
+	./node_modules/.bin/markdownlint **/*.md
+
+lint: backend.lint frontend.lint docs.lint ## Run all linters
 
 # ── Format ────────────────────────────────────────────────────────────────────
 
