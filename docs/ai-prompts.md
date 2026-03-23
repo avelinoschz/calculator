@@ -183,11 +183,13 @@ Key constraints from AGENTS.md:
 
 ## 5. Reviewer Prompt
 
-Use this prompt after a meaningful implementation step, such as backend
-core, frontend core, or a final review pass.
+Use this prompt for a final review pass after all phases are complete.
+It covers the full application stack: backend, frontend, tooling,
+developer experience, and documentation.
 
 ```text
-Act as a strict and pragmatic code reviewer.
+Act as a strict and pragmatic senior engineer doing a final review
+of a completed project before handoff.
 
 Read the following files first:
 - README.md
@@ -198,25 +200,50 @@ Read the following files first:
 - api/openapi.yaml
 - docs/adr/0001-architecture-and-api.md
 - docs/adr/0002-tooling-and-delivery.md
+- docs/adr/0003-frontend-architecture.md
+- docs/adr/0004-environment-variables-for-configuration.md
+- docs/ai-prompts.md
+- Makefile
+- docker-compose.yml
+- .github/ (CI workflows)
 
-Then review the current implementation for:
-- correctness against requirements
-- maintainability
-- unnecessary complexity
-- API contract mismatches
-- missing validation
-- missing tests
-- frontend/backend inconsistencies
-- naming or structure issues
+Then review the current implementation across all four phases:
+
+Backend (Phase 1):
+- correctness of domain logic against requirements and API contract
+- request validation and error response shape
+- test coverage and quality (table-driven, edge cases)
+- structured logging and graceful shutdown
+- naming, package structure, and separation of concerns
+
+Frontend (Phase 2):
+- correctness of UI behavior against acceptance criteria
+- isolation of API layer from components
+- client-side validation before submission
+- error and result state handling
+- test coverage (unit, integration, end-to-end if applicable)
+- frontend/backend contract alignment (field names, status codes, error codes)
+
+Developer experience (Phase 3):
+- Makefile targets: completeness, naming clarity, and correctness
+- Docker builds: multi-stage correctness, image hygiene
+- Docker Compose: service wiring, environment variable propagation
+- CI pipeline: coverage of lint, test, and build steps
+
+Documentation (Phase 4):
+- README accuracy against actual implementation
+- OpenAPI spec alignment with handler behavior
+- ADR completeness and relevance
+- First-time reader clarity and scannability
 
 Do not implement changes yet.
 
 Return the review in this format:
-1. Critical issues
-2. Medium issues
-3. Low-priority improvements
-4. Items that should be de-scoped
-5. Final review of code quality and maintainability
+1. Critical issues (correctness, contract mismatches, broken tooling)
+2. Medium issues (missing validation, weak tests, misleading docs)
+3. Low-priority improvements (naming, structure, style)
+4. Items that are out of scope and should not be added
+5. Final verdict on readiness: is this project ready for handoff as-is?
 ```
 
 ## Notes
