@@ -93,7 +93,8 @@ Avoid implementing:
 - Test across three layers:
   - API layer (`src/api/`) — plain TypeScript, mock `fetch` with `vi.stubGlobal`
   - Component layer (`src/components/`) — render in isolation, no network calls
-  - Integration (`App`) — full component tree with mocked fetch, assert on visible output
+  - Integration (`App`) — full component tree with mocked fetch,
+    assert on visible output
 - Cover critical user flows:
   - valid submission
   - validation errors
@@ -114,8 +115,8 @@ documentation updates. Specifically:
   decision is made
 
 Documentation must be updated in the same change as the feature itself, not
-as a follow-up. Use the coverage target addition (Makefile + `backend/README.md`
-+ `frontend/README.md` + root `README.md`) as a reference example.
+as a follow-up. Use the coverage target addition (Makefile, `backend/README.md`,
+`frontend/README.md`, and root `README.md`) as a reference example.
 
 ## Tooling Rules
 
