@@ -39,7 +39,8 @@ The two main process artifacts are:
 
 - `specs/calculator/plan.md` — the phased execution guide used during
   development
-- `docs/ai-prompts.md` — representative prompts showing how AI was used
+- `docs/ai-prompts.md` — archived representative prompts preserved from
+  that workflow
 
 ## Run
 

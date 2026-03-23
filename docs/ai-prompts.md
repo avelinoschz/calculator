@@ -1,32 +1,32 @@
 # AI Usage Summary
 
-This project was developed using an AI-assisted workflow to improve
-productivity, structure, and code quality.
+This project was developed using an AI-assisted workflow.
 
 AI was used as a collaborative assistant for:
 
 - translating requirements into structured specifications
-- defining architecture and design decisions (ADRs)
-- proposing project structure
-- guiding implementation sequencing
+- planning phased implementation
 - generating and refining code
-- reviewing the implementation from a senior-level code review perspective
+- reviewing the implementation
 - drafting and improving documentation
 
 All AI-generated or AI-assisted outputs were manually reviewed,
 validated, and adjusted before inclusion.
 
-The goal was not to rely blindly on AI, but to use it as a tool to
-accelerate iteration while maintaining full ownership of design
-decisions and code quality.
+The goal was to use AI to accelerate iteration while maintaining full
+ownership of design decisions and code quality.
 
 ## AI Prompts
 
-This document captures a small set of representative prompts used during development.
+This document is a representative prompt archive ordered to match the
+development sequence.
 
-The goal is not to document every single prompt, but to preserve the
-most useful prompts that shaped the project structure, implementation
-flow, and review process.
+It is intended to show how AI was used for specification, phased
+implementation, review, and documentation. It is not a full transcript
+of every interaction.
+
+Prompt bodies below are preserved as originally used. Only the
+surrounding summary text is editorial.
 
 ## 1. Initial Structure Prompt
 
@@ -132,7 +132,7 @@ Basic responsive layout for mobile
 Start by reading the spec files listed above, then plan before implementing.
 ```
 
-## 3. Phase 3 — Developer Experience Prompt
+## 3. Phase 3 — Developer Experience Summary
 
 The same implementation-prompt pattern was reused for Phase 3, with the
 repository state, completed phases, and constraints updated to match the
@@ -255,5 +255,3 @@ They are meant to demonstrate structured use of AI for:
 - planning
 - implementation guidance
 - review and quality control
-
-Additional prompts used during implementation can be added later if needed.

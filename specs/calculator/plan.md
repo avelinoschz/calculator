@@ -274,8 +274,9 @@ This plan and `docs/ai-prompts.md` serve different purposes:
 
 - `specs/calculator/plan.md` records the phased execution strategy used
   during development
-- `docs/ai-prompts.md` records representative prompt patterns used to
-  execute that strategy with AI assistance
+- `docs/ai-prompts.md` records a representative archive of prompts used
+  to execute that strategy with AI assistance; it is not intended to be
+  exhaustive
 
 Together they document the spec-driven development process used for the
 project.
