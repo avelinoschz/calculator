@@ -143,6 +143,7 @@ curl -s -X POST http://localhost:8080/api/v1/calculations \
 | `make backend.setup` | Install backend tooling and download Go module dependencies |
 | `make backend.run` | Run the Go server (port 8080) |
 | `make backend.test` | Run Go tests |
+| `make backend.coverage` | Run Go tests with coverage report |
 | `make backend.lint` | Run golangci-lint |
 | `make backend.format` | Auto-fix Go lint issues |
 | `make backend.build` | Build binary → `backend/bin/server` |
@@ -162,6 +163,17 @@ domain logic and HTTP handlers are tested independently.
 
 Tests run with `-shuffle=on -count=1` to catch order-dependent failures
 and disable Go's result cache so tests always execute.
+
+## Coverage
+
+```sh
+make backend.coverage
+# or
+cd backend && go test -shuffle=on -count=1 -coverprofile=coverage.out -covermode=atomic ./... && go tool cover -func=coverage.out
+```
+
+Runs the full test suite and prints a per-function coverage summary to
+stdout. The raw profile is written to `backend/coverage.out`.
 
 ## Linting
 

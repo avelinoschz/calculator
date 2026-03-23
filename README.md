@@ -124,6 +124,7 @@ make help
 | `make frontend.setup` | Install Node dependencies (npm ci) |
 | `make run` | Run backend and frontend locally in parallel |
 | `make test` | Run all tests |
+| `make coverage` | Run all tests with coverage reports |
 | `make lint` | Run all linters |
 | `make format` | Auto-fix all lint issues |
 | `make build` | Build backend binary and frontend assets |
