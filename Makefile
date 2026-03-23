@@ -1,4 +1,11 @@
+INSTALL_BIN_DIR := $(CURDIR)/bin
+GOLANGCI_LINT_VERSION := latest
+
+export PATH := $(INSTALL_BIN_DIR):$(PATH)
+export GOBIN := $(INSTALL_BIN_DIR)
+
 .PHONY: help \
+	backend.setup \
 	backend.run frontend.run run \
 	backend.test frontend.test test \
 	backend.lint frontend.lint lint \
@@ -9,6 +16,11 @@
 help: ## Show available make targets
 	@grep -E '^[a-zA-Z_.]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  %-25s %s\n", $$1, $$2}'
+
+# ── Setup ─────────────────────────────────────────────────────────────────────
+
+backend.setup: ## Install backend tooling into bin/
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
 
 # ── Run ───────────────────────────────────────────────────────────────────────
 
@@ -34,7 +46,7 @@ test: backend.test frontend.test ## Run all tests
 # ── Lint ──────────────────────────────────────────────────────────────────────
 
 backend.lint: ## Run golangci-lint
-	cd backend && golangci-lint run ./...
+	cd backend && $(INSTALL_BIN_DIR)/golangci-lint run ./...
 
 frontend.lint: ## Run ESLint
 	cd frontend && npm run lint
