@@ -5,6 +5,8 @@ Simple full-stack calculator system built with:
 - Backend: Go (net/http)
 - Frontend: React + TypeScript
 
+![Calculator UI](docs/assets/screenshot.png)
+
 ## Overview
 
 This repository contains the specification, API contract, and design
