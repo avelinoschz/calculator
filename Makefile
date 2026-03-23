@@ -130,10 +130,11 @@ frontend.docker.run: ## Run the frontend service via Docker Compose
 
 # ── Clean ─────────────────────────────────────────────────────────────────────
 
-backend.clean: ## Remove backend build artifacts (backend/bin/)
-	rm -rf backend/bin
+backend.clean: ## Remove backend build artifacts (backend/bin/, coverage files)
+	rm -rf backend/bin backend/coverage.out backend/coverage.html
 
-frontend.clean: ## Remove frontend build artifacts (frontend/dist/)
-	rm -rf frontend/dist
+frontend.clean: ## Remove frontend build artifacts (frontend/dist/, frontend/coverage/)
+	rm -rf frontend/dist frontend/coverage
 
-clean: backend.clean frontend.clean ## Remove all build artifacts
+clean: backend.clean frontend.clean ## Remove all build artifacts and installed tools (bin/)
+	rm -rf bin
