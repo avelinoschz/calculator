@@ -119,6 +119,8 @@ make help
 | Target | Description |
 | --- | --- |
 | `make setup` | Bootstrap local environment (tools + dependencies) |
+| `make backend.setup` | Install backend tooling and download Go module dependencies |
+| `make frontend.setup` | Install Node dependencies (npm ci) |
 | `make run` | Run backend and frontend locally in parallel |
 | `make test` | Run all tests |
 | `make lint` | Run all linters |

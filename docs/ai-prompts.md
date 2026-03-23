@@ -132,25 +132,56 @@ Basic responsive layout for mobile
 Start by reading the spec files listed above, then plan before implementing.
 ```
 
-## 3. Other Phase Variants
+## 3. Phase 3 — Developer Experience Prompt
 
-The same implementation-prompt pattern was reused for the later phases,
-with the repository state, completed phases, and constraints updated to
-match the next step in the plan.
+The same implementation-prompt pattern was reused for Phase 3, with the
+repository state, completed phases, and constraints updated to match the
+next step in the plan.
 
-For Phase 3, the prompt shifted from product functionality to developer
-experience and delivery requirements such as Make targets, Docker,
-Docker Compose, and CI automation.
+The prompt shifted from product functionality to developer experience and
+delivery requirements: Make targets, Docker, Docker Compose, and CI automation.
 
-For Phase 4, the prompt shifted again toward documentation quality,
-reviewer usability, and concise delivery polish without reopening stable
-application code.
+It followed the same core structure as the frontend implementation prompt
+above, so it is summarized here rather than repeated in full.
 
-These later prompts were useful in practice, but they followed the same
-core structure as the frontend implementation prompt above, so they are
-summarized here rather than repeated in full.
+## 4. Phase 4 — Documentation and Delivery Polish Prompt
 
-## 4. Reviewer Prompt
+Used this prompt to implement the documentation and delivery polish phase
+after the full application stack and tooling were already in place.
+
+Its purpose was to focus exclusively on documentation quality, reviewer
+usability, and concise delivery polish without reopening stable application
+code.
+
+```text
+This is a full-stack calculator project. The repository is at /github.com/avelinoschz/calculator.
+
+Phases 1 (Go backend), 2 (React frontend), and 3 (Developer Experience and
+Quality Gates) are complete. Read the following files before doing anything:
+
+AGENTS.md                          — implementation rules and priorities
+specs/calculator/requirements.md   — scope and acceptance criteria
+specs/calculator/plan.md           — phased delivery plan
+
+What is already built:
+
+All source code, tests, Dockerfiles, docker-compose, nginx, CI, and Makefile
+are in place.
+
+Your task:
+
+Implement Phase 4 — Documentation and Delivery Polish — as described in
+specs/calculator/plan.md.
+
+Key constraints from AGENTS.md:
+
+- Do not reopen stable application code
+- Prioritize reviewer usability and first-time reader clarity
+- All documentation should reflect the actual implementation
+- Keep documentation concise and scannable
+```
+
+## 5. Reviewer Prompt
 
 Use this prompt after a meaningful implementation step, such as backend
 core, frontend core, or a final review pass.

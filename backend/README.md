@@ -165,6 +165,12 @@ and disable Go's result cache so tests always execute.
 
 ## Linting
 
+First-time setup (installs `golangci-lint` into `bin/`):
+
+```sh
+make backend.setup
+```
+
 ```sh
 make backend.lint
 # or
