@@ -1,7 +1,6 @@
 ---
 name: suggest-commit
 description: Inspects currently staged files and suggests a conventional commit message. Offers to run git commit with the suggested message.
-allowed-tools: Bash(git *)
 ---
 
 You are helping the user craft a high-quality git commit message for their staged changes.
