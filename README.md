@@ -31,6 +31,8 @@ well-structured, and production-minded solution.
 - `docs/adr/0002-tooling-and-delivery.md` captures tooling and delivery decisions.
 - `docs/adr/0003-frontend-architecture.md` captures frontend architecture decisions.
 - `AGENTS.md` provides implementation guidance for AI-assisted workflows.
+- `backend/README.md` covers the Go backend in full detail.
+- `frontend/README.md` covers the React frontend in full detail.
 
 ## AI-Assisted Development
 
@@ -46,7 +48,7 @@ Representative prompts used during development can be found in:
 
 - `docs/ai-prompts.md`
 
-## Target Features
+## Features
 
 - Addition
 - Subtraction
@@ -55,18 +57,15 @@ Representative prompts used during development can be found in:
 
 ## API
 
-- `POST /api/v1/calculations`
+`POST /api/v1/calculations`
 
-This endpoint is defined as part of the current project specification.
-
-See:
-
-- `specs/calculator/api.md`
-- `api/openapi.yaml`
+See [`specs/calculator/api.md`](specs/calculator/api.md) and
+[`api/openapi.yaml`](api/openapi.yaml) for the full contract, or
+[`backend/README.md`](backend/README.md) for runnable examples.
 
 ## How to Run
 
-### Quick start — local dev
+### Local dev
 
 Prerequisites: Go 1.21+, Node.js 20+, npm.
 
@@ -83,7 +82,7 @@ make frontend.run # Vite dev server on http://localhost:5173
 
 All frontend API requests are proxied to `:8080` by the Vite dev server.
 
-### Quick start — Docker Compose
+### Docker Compose
 
 Prerequisites: Docker with Compose v2.
 
@@ -95,19 +94,7 @@ make down # stops all containers
 The frontend is served by nginx on `http://localhost:80`. API requests to
 `/api/` are proxied to the backend container.
 
-### Verify the backend
-
-```sh
-curl http://localhost:8080/health
-# {"status":"ok"}
-
-curl -s -X POST http://localhost:8080/api/v1/calculations \
-  -H "Content-Type: application/json" \
-  -d '{"op":"add","a":10,"b":5}'
-# {"result":15}
-```
-
-### All Makefile targets
+### Makefile targets
 
 ```sh
 make help
@@ -116,58 +103,31 @@ make help
 | Target | Description |
 | --- | --- |
 | `make run` | Run backend and frontend locally in parallel |
-| `make backend.run` | Run the Go backend (port 8080) |
-| `make frontend.run` | Run the Vite dev server (port 5173) |
 | `make test` | Run all tests |
-| `make backend.test` | Run Go tests |
-| `make frontend.test` | Run Vitest (single-run) |
 | `make lint` | Run all linters |
-| `make backend.lint` | Run golangci-lint |
-| `make frontend.lint` | Run ESLint |
 | `make build` | Build backend binary and frontend assets |
-| `make backend.build` | Build Go binary → `backend/bin/server` |
-| `make frontend.build` | Build frontend static assets → `frontend/dist/` |
 | `make docker.build` | Build all Docker images |
-| `make backend.docker.build` | Build the backend Docker image |
-| `make frontend.docker.build` | Build the frontend Docker image |
 | `make up` | Start the full stack with Docker Compose |
 | `make down` | Stop the full stack |
+
+For per-service targets (`backend.test`, `frontend.lint`, etc.) see
+[`backend/README.md`](backend/README.md) and
+[`frontend/README.md`](frontend/README.md).
 
 ## Project Structure
 
 ```text
-backend/
-  cmd/server/         ← entry point, graceful shutdown
-  internal/
-    calculator/       ← domain logic, sentinel errors, unit tests
-    handler/          ← HTTP handlers, request/response models, handler tests
-  Dockerfile          ← golang:alpine build stage → distroless runtime stage
-  .golangci.yml       ← golangci-lint configuration
+backend/    ← Go API server
+frontend/   ← React + TypeScript UI
+Makefile
+docker-compose.yml
+nginx.conf
+.github/workflows/ci.yml
 ```
 
-```text
-frontend/
-  src/
-    api/              ← typed fetch wrapper; no React imports
-    components/       ← form components with client-side validation
-    App.tsx           ← root component; holds result, error, and loading state
-    main.tsx          ← ReactDOM.createRoot entry point
-  index.html
-  vite.config.ts      ← build config, dev proxy (/api → :8080), Vitest config
-  Dockerfile          ← node:20-alpine build stage → nginx:alpine serve stage
-```
-
-```text
-Makefile              ← common developer targets (run, test, lint, build, docker, compose)
-docker-compose.yml    ← orchestrates backend + frontend containers
-nginx.conf            ← nginx proxy config for Docker Compose (proxies /api/ to backend)
-.github/workflows/
-  ci.yml              ← GitHub Actions: lint, test, build (backend and frontend jobs)
-```
-
-The key separation of concerns: components never import fetch directly.
-All network calls go through `src/api/`, keeping UI logic and data
-fetching independently testable.
+See [`backend/README.md`](backend/README.md) and
+[`frontend/README.md`](frontend/README.md) for detailed structure and
+per-service commands.
 
 ## Design
 
