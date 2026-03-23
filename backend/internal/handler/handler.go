@@ -3,11 +3,20 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 
 	"github.com/avelinoschz/calculator/backend/internal/calculator"
 )
+
+// Handler holds configuration for the calculate endpoint.
+type Handler struct {
+	// Min and Max define the allowed range for operands.
+	// Use math.Inf(-1) and math.Inf(1) for no limits (the defaults).
+	Min float64
+	Max float64
+}
 
 // Health handles GET /health.
 func Health(w http.ResponseWriter, r *http.Request) {
@@ -15,7 +24,7 @@ func Health(w http.ResponseWriter, r *http.Request) {
 }
 
 // Calculate handles POST /api/v1/calculations.
-func Calculate(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Calculate(w http.ResponseWriter, r *http.Request) {
 	var req CalculateRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -26,6 +35,12 @@ func Calculate(w http.ResponseWriter, r *http.Request) {
 
 	if req.Operation == "" {
 		writeError(w, http.StatusBadRequest, ErrCodeMissingField, "op is required")
+		return
+	}
+
+	if req.A < h.Min || req.A > h.Max || req.B < h.Min || req.B > h.Max {
+		writeError(w, http.StatusUnprocessableEntity, ErrCodeOperandOutOfRange,
+			fmt.Sprintf("operands must be between %g and %g", h.Min, h.Max))
 		return
 	}
 

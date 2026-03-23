@@ -124,6 +124,14 @@ as a follow-up. Use the coverage target addition (Makefile + `backend/README.md`
 - Support both:
   - local execution
   - Docker Compose execution
+- Always use Makefile targets — do not invoke raw tool commands directly:
+  - Backend tests: `make backend.test`
+  - Frontend tests: `make frontend.test`
+  - All tests: `make test`
+  - Backend linting: `make backend.lint`
+  - Frontend linting: `make frontend.lint`
+  - Build: `make build`
+  - Run locally: `make run`
 
 ## Coding Guidelines
 

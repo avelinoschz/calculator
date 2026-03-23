@@ -42,6 +42,37 @@ Business logic lives entirely in `internal/calculator` and has no
 knowledge of HTTP. The handler layer maps domain errors to status codes
 using `errors.Is`, keeping transport and domain concerns separate.
 
+## Configuration
+
+The server reads the following environment variables on startup. All
+variables are optional; when absent, the corresponding limit is not
+applied.
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `CALC_MIN` | _(none)_ | Minimum allowed value for operands `a` and `b` |
+| `CALC_MAX` | _(none)_ | Maximum allowed value for operands `a` and `b` |
+
+A `.env` file at the repository root is sourced automatically by
+`make backend.run`. The repository ships with defaults already set:
+
+```sh
+make backend.run  # picks up CALC_MIN=-1000 CALC_MAX=1000 from .env
+```
+
+To override for a single run, set the variables in the shell — they
+take precedence over the `.env` file:
+
+```sh
+CALC_MIN=-500 CALC_MAX=500 make backend.run
+```
+
+If a variable is set to a value that cannot be parsed as a float64,
+the server logs a warning and falls back to no limit on that side.
+
+See [ADR 0004](../docs/adr/0004-environment-variables-for-configuration.md)
+for the rationale behind this approach.
+
 ## API
 
 The server exposes two endpoints. See [`specs/calculator/api.md`](../specs/calculator/api.md)
@@ -59,7 +90,7 @@ curl http://localhost:8080/health
 
 ### POST /api/v1/calculations
 
-**Request shape**
+#### Request shape
 
 ```json
 {"op": "<operation>", "a": <number>, "b": <number>}
@@ -67,7 +98,7 @@ curl http://localhost:8080/health
 
 Supported operations: `add`, `subtract`, `multiply`, `divide`.
 
-**Examples**
+#### Examples
 
 Addition:
 
@@ -105,7 +136,7 @@ curl -s -X POST http://localhost:8080/api/v1/calculations \
 # {"result":5}
 ```
 
-**Error examples**
+#### Error examples
 
 Division by zero (422):
 
@@ -114,6 +145,16 @@ curl -s -X POST http://localhost:8080/api/v1/calculations \
   -H "Content-Type: application/json" \
   -d '{"op":"divide","a":10,"b":0}'
 # {"error":{"code":"DIVISION_BY_ZERO","message":"division by zero is not allowed"}}
+```
+
+Operand out of range (422, requires `CALC_MIN`/`CALC_MAX` to be set):
+
+```sh
+CALC_MIN=-100 CALC_MAX=100 ./bin/server &
+curl -s -X POST http://localhost:8080/api/v1/calculations \
+  -H "Content-Type: application/json" \
+  -d '{"op":"add","a":9999,"b":1}'
+# {"error":{"code":"OPERAND_OUT_OF_RANGE","message":"operands must be between -100 and 100"}}
 ```
 
 Invalid operation (400):
@@ -125,7 +166,7 @@ curl -s -X POST http://localhost:8080/api/v1/calculations \
 # {"error":{"code":"INVALID_OPERATION","message":"operation must be one of add, subtract, multiply, divide"}}
 ```
 
-**Error codes**
+#### Error codes
 
 | Code | Status | Description |
 | --- | --- | --- |
@@ -134,6 +175,7 @@ curl -s -X POST http://localhost:8080/api/v1/calculations \
 | `MISSING_FIELD` | 400 | A required field is absent |
 | `INVALID_NUMBER` | 400 | One or more operands are invalid |
 | `DIVISION_BY_ZERO` | 422 | Division by zero is not allowed |
+| `OPERAND_OUT_OF_RANGE` | 422 | An operand is outside the configured limits |
 | `INTERNAL_ERROR` | 500 | Unexpected server error |
 
 ## Makefile targets
@@ -208,7 +250,8 @@ cd backend && go build -o bin/server ./cmd/server
 
 Output binary: `backend/bin/server`.
 
-The current git commit SHA is embedded at build time via `-ldflags "-X main.version=<SHA>"` and logged on startup:
+The current git commit SHA is embedded at build time via
+`-ldflags "-X main.version=<SHA>"` and logged on startup:
 
 ```json
 {"time":"...","level":"INFO","msg":"starting","version":"7880150..."}

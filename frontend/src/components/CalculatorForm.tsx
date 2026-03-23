@@ -35,6 +35,21 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
       return
     }
 
+    const calcMin = import.meta.env.VITE_CALC_MIN !== undefined
+      ? parseFloat(import.meta.env.VITE_CALC_MIN) : null
+    const calcMax = import.meta.env.VITE_CALC_MAX !== undefined
+      ? parseFloat(import.meta.env.VITE_CALC_MAX) : null
+
+    if (calcMin !== null && (numA < calcMin || numB < calcMin)) {
+      setValidationError(`Operands must be at least ${calcMin}.`)
+      return
+    }
+
+    if (calcMax !== null && (numA > calcMax || numB > calcMax)) {
+      setValidationError(`Operands must be at most ${calcMax}.`)
+      return
+    }
+
     setValidationError(null)
     onSubmit(op, numA, numB)
   }

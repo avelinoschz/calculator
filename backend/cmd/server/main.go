@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"math"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -20,9 +22,18 @@ func main() {
 	slog.SetDefault(logger)
 	slog.Info("starting", "version", version)
 
+	h := &handler.Handler{
+		Min: parseEnvFloat("CALC_MIN", math.Inf(-1)),
+		Max: parseEnvFloat("CALC_MAX", math.Inf(1)),
+	}
+
+	if !math.IsInf(h.Min, -1) || !math.IsInf(h.Max, 1) {
+		slog.Info("operand limits configured", "min", h.Min, "max", h.Max)
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", handler.Health)
-	mux.HandleFunc("POST /api/v1/calculations", handler.Calculate)
+	mux.HandleFunc("POST /api/v1/calculations", h.Calculate)
 
 	srv := &http.Server{
 		Addr:    ":8080",
@@ -52,4 +63,17 @@ func main() {
 	}
 
 	slog.Info("server stopped")
+}
+
+func parseEnvFloat(key string, fallback float64) float64 {
+	val := os.Getenv(key)
+	if val == "" {
+		return fallback
+	}
+	f, err := strconv.ParseFloat(val, 64)
+	if err != nil {
+		slog.Warn("invalid env var value, using default", "key", key, "value", val, "default", fallback)
+		return fallback
+	}
+	return f
 }

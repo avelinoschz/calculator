@@ -42,10 +42,10 @@ setup: backend.setup frontend.setup docs.setup ## Bootstrap local environment (t
 # ── Run ───────────────────────────────────────────────────────────────────────
 
 backend.run: ## Run the Go backend (port 8080)
-	cd backend && go run $(GO_BUILD_FLAGS) ./cmd/server
+	set -a; [ -f .env ] && . ./.env; set +a; cd backend && go run $(GO_BUILD_FLAGS) ./cmd/server
 
 frontend.run: ## Run the Vite dev server (port 5173)
-	cd frontend && npm run dev
+	set -a; [ -f .env ] && . ./.env; set +a; cd frontend && npm run dev
 
 run: ## Run backend and frontend locally in parallel
 	$(MAKE) -j2 backend.run frontend.run

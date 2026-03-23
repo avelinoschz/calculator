@@ -3,6 +3,7 @@ package handler_test
 import (
 	"bytes"
 	"encoding/json"
+	"math"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,6 +13,10 @@ import (
 
 	"github.com/avelinoschz/calculator/backend/internal/handler"
 )
+
+func noLimitsHandler() *handler.Handler {
+	return &handler.Handler{Min: math.Inf(-1), Max: math.Inf(1)}
+}
 
 func TestCalculateHandler(t *testing.T) {
 	tests := []struct {
@@ -77,13 +82,83 @@ func TestCalculateHandler(t *testing.T) {
 		},
 	}
 
+	h := noLimitsHandler()
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, "/api/v1/calculations", bytes.NewBufferString(tc.body))
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
 
-			handler.Calculate(rec, req)
+			h.Calculate(rec, req)
+
+			assert.Equal(t, tc.wantStatus, rec.Code)
+			assert.Equal(t, "application/json", rec.Header().Get("Content-Type"))
+
+			if tc.wantResult != nil {
+				var resp handler.CalculateResponse
+				require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
+				assert.InDelta(t, *tc.wantResult, resp.Result, 1e-9)
+			}
+
+			if tc.wantErrorCode != "" {
+				var resp handler.ErrorResponse
+				require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
+				assert.Equal(t, tc.wantErrorCode, resp.Error.Code)
+				assert.NotEmpty(t, resp.Error.Message)
+			}
+		})
+	}
+}
+
+func TestCalculateHandlerOperandLimits(t *testing.T) {
+	h := &handler.Handler{Min: -100, Max: 100}
+
+	tests := []struct {
+		name          string
+		body          string
+		wantStatus    int
+		wantResult    *float64
+		wantErrorCode string
+	}{
+		{
+			name:       "both operands within range",
+			body:       `{"op":"add","a":50,"b":50}`,
+			wantStatus: http.StatusOK,
+			wantResult: ptr(100.0),
+		},
+		{
+			name:       "operands at exact boundaries",
+			body:       `{"op":"add","a":-100,"b":100}`,
+			wantStatus: http.StatusOK,
+			wantResult: ptr(0.0),
+		},
+		{
+			name:          "a below min",
+			body:          `{"op":"add","a":-101,"b":0}`,
+			wantStatus:    http.StatusUnprocessableEntity,
+			wantErrorCode: handler.ErrCodeOperandOutOfRange,
+		},
+		{
+			name:          "b above max",
+			body:          `{"op":"add","a":0,"b":101}`,
+			wantStatus:    http.StatusUnprocessableEntity,
+			wantErrorCode: handler.ErrCodeOperandOutOfRange,
+		},
+		{
+			name:          "both operands out of range",
+			body:          `{"op":"add","a":-999,"b":999}`,
+			wantStatus:    http.StatusUnprocessableEntity,
+			wantErrorCode: handler.ErrCodeOperandOutOfRange,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodPost, "/api/v1/calculations", bytes.NewBufferString(tc.body))
+			req.Header.Set("Content-Type", "application/json")
+			rec := httptest.NewRecorder()
+
+			h.Calculate(rec, req)
 
 			assert.Equal(t, tc.wantStatus, rec.Code)
 			assert.Equal(t, "application/json", rec.Header().Get("Content-Type"))

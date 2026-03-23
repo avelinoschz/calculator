@@ -25,9 +25,10 @@ type ErrorResponse struct {
 
 // Error code constants matching the API contract.
 const (
-	ErrCodeInvalidRequest   = "INVALID_REQUEST"
-	ErrCodeInvalidOperation = "INVALID_OPERATION"
-	ErrCodeMissingField     = "MISSING_FIELD"
-	ErrCodeDivisionByZero   = "DIVISION_BY_ZERO"
-	ErrCodeInternalError    = "INTERNAL_ERROR"
+	ErrCodeInvalidRequest    = "INVALID_REQUEST"
+	ErrCodeInvalidOperation  = "INVALID_OPERATION"
+	ErrCodeMissingField      = "MISSING_FIELD"
+	ErrCodeDivisionByZero    = "DIVISION_BY_ZERO"
+	ErrCodeOperandOutOfRange = "OPERAND_OUT_OF_RANGE"
+	ErrCodeInternalError     = "INTERNAL_ERROR"
 )

@@ -31,6 +31,8 @@ well-structured, and production-minded solution.
   and API design decisions.
 - `docs/adr/0002-tooling-and-delivery.md` captures tooling and delivery decisions.
 - `docs/adr/0003-frontend-architecture.md` captures frontend architecture decisions.
+- `docs/adr/0004-environment-variables-for-configuration.md` captures the
+  decision to use environment variables for runtime configuration.
 - `AGENTS.md` provides implementation guidance for AI-assisted workflows.
 - `backend/README.md` covers the Go backend in full detail.
 - `frontend/README.md` covers the React frontend in full detail.
@@ -55,6 +57,8 @@ Representative prompts used during development can be found in:
 - Subtraction
 - Multiplication
 - Division
+- Configurable operand limits via environment variables (`CALC_MIN`,
+  `CALC_MAX`)
 
 ## API
 
@@ -164,12 +168,16 @@ per-service commands.
   needed at this scale.
 - **Isolated API layer** — frontend `src/api/` is decoupled from UI
   components and mocked independently in tests.
+- **Runtime configuration via env vars** — operand limits (`CALC_MIN`,
+  `CALC_MAX`) are read from the environment at startup; changing them
+  requires no code change or rebuild.
 
 Full rationale in the ADRs:
 
 - [Architecture and API](docs/adr/0001-architecture-and-api.md)
 - [Tooling and Delivery](docs/adr/0002-tooling-and-delivery.md)
 - [Frontend Architecture](docs/adr/0003-frontend-architecture.md)
+- [Environment Variables for Configuration](docs/adr/0004-environment-variables-for-configuration.md)
 
 ## Trade-offs
 
@@ -181,6 +189,7 @@ Full rationale in the ADRs:
 | No authentication | Out of scope for a local demo |
 | Distroless runtime image | Minimal attack surface; no shell in the production container |
 | `net/http` over a framework | Sufficient for one endpoint; avoids unnecessary abstractions |
+| Env vars for operand limits | No rebuild needed to change limits; aligns with twelve-factor config |
 
 ### Future improvements
 

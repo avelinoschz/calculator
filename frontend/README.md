@@ -46,6 +46,33 @@ frontend/
 Components never import `fetch` directly. All network calls go through
 `src/api/`, keeping UI logic and data fetching independently testable.
 
+## Configuration
+
+The frontend reads the following Vite environment variables at **build
+time**. They are optional; when absent, no client-side range check is
+performed.
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `VITE_CALC_MIN` | _(none)_ | Minimum allowed value shown in validation errors |
+| `VITE_CALC_MAX` | _(none)_ | Maximum allowed value shown in validation errors |
+
+A `.env` file at the repository root is sourced automatically by
+`make frontend.run`, which exports `VITE_CALC_*` into the Vite process
+environment. The repository ships with defaults already set:
+
+```sh
+make frontend.run  # picks up VITE_CALC_MIN=-1000 VITE_CALC_MAX=1000 from .env
+```
+
+Because Vite inlines these values at build time, changing them requires
+restarting the dev server (or rebuilding for production). The backend
+is the authoritative validator; frontend limits are a UX convenience
+only.
+
+See [ADR 0004](../docs/adr/0004-environment-variables-for-configuration.md)
+for the rationale behind this approach.
+
 ## Dev proxy
 
 In development, Vite proxies all `/api/*` requests to `http://localhost:8080`.
