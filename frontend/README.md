@@ -42,10 +42,22 @@ UX only; the backend remains the authoritative validator.
 
 - API calls are isolated in `src/api/calculator.ts`
 - components do not call `fetch` directly
-- empty inputs are rejected before submission
+- empty active inputs are rejected before submission
 - partial garbage like `12abc` is rejected before submission
 - non-finite values such as `Infinity` are rejected before submission
+- `sqrt` uses a single visible operand and omits `b` from the request
+- negative square root is rejected before submission
 - backend error messages are surfaced in the UI
+
+Supported operations:
+
+- `add`
+- `subtract`
+- `multiply`
+- `divide`
+- `power`
+- `sqrt`
+- `percentage`
 
 ## Make Targets
 
@@ -55,8 +67,8 @@ UX only; the backend remains the authoritative validator.
 | `make frontend.run` | Run the Vite dev server |
 | `make frontend.test` | Run Vitest |
 | `make frontend.coverage` | Run Vitest with coverage |
-| `make frontend.lint` | Run ESLint |
-| `make frontend.format` | Auto-fix frontend lint issues |
+| `make frontend.lint` | Run ESLint (use `FIX=1` to auto-fix) |
+| `make frontend.format` | Format frontend source files (Prettier) |
 | `make frontend.build` | Build `frontend/dist/` |
 | `make frontend.clean` | Remove frontend build artifacts |
 | `make frontend.docker.build` | Build the frontend Docker image |

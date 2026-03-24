@@ -65,6 +65,24 @@ func TestCalculateHandler(t *testing.T) {
 			wantResult: ptr(5.0),
 		},
 		{
+			name:       "power two numbers",
+			body:       `{"op":"power","a":2,"b":3}`,
+			wantStatus: http.StatusOK,
+			wantResult: ptr(8.0),
+		},
+		{
+			name:       "percentage of value",
+			body:       `{"op":"percentage","a":10,"b":200}`,
+			wantStatus: http.StatusOK,
+			wantResult: ptr(20.0),
+		},
+		{
+			name:       "square root with one operand",
+			body:       `{"op":"sqrt","a":9}`,
+			wantStatus: http.StatusOK,
+			wantResult: ptr(3.0),
+		},
+		{
 			name:          "division by zero",
 			body:          `{"op":"divide","a":10,"b":0}`,
 			wantStatus:    http.StatusUnprocessableEntity,
@@ -72,9 +90,21 @@ func TestCalculateHandler(t *testing.T) {
 		},
 		{
 			name:          "invalid operation",
-			body:          `{"op":"power","a":2,"b":3}`,
+			body:          `{"op":"modulo","a":2,"b":3}`,
 			wantStatus:    http.StatusBadRequest,
 			wantErrorCode: handler.ErrCodeInvalidOperation,
+		},
+		{
+			name:          "negative square root",
+			body:          `{"op":"sqrt","a":-1}`,
+			wantStatus:    http.StatusUnprocessableEntity,
+			wantErrorCode: handler.ErrCodeNegativeSquareRoot,
+		},
+		{
+			name:          "non finite result",
+			body:          `{"op":"power","a":1e308,"b":2}`,
+			wantStatus:    http.StatusUnprocessableEntity,
+			wantErrorCode: handler.ErrCodeNonFiniteResult,
 		},
 		{
 			name:          "missing operation field",
@@ -93,6 +123,12 @@ func TestCalculateHandler(t *testing.T) {
 			body:          `{"op":"add","a":2}`,
 			wantStatus:    http.StatusBadRequest,
 			wantErrorCode: handler.ErrCodeMissingField,
+		},
+		{
+			name:          "sqrt rejects second operand",
+			body:          `{"op":"sqrt","a":9,"b":1}`,
+			wantStatus:    http.StatusBadRequest,
+			wantErrorCode: handler.ErrCodeInvalidRequest,
 		},
 		{
 			name:          "malformed JSON",
@@ -171,8 +207,20 @@ func TestCalculateHandlerOperandLimits(t *testing.T) {
 			wantResult: ptr(0.0),
 		},
 		{
+			name:       "sqrt operand within range",
+			body:       `{"op":"sqrt","a":100}`,
+			wantStatus: http.StatusOK,
+			wantResult: ptr(10.0),
+		},
+		{
 			name:          "a below min",
 			body:          `{"op":"add","a":-101,"b":0}`,
+			wantStatus:    http.StatusUnprocessableEntity,
+			wantErrorCode: handler.ErrCodeOperandOutOfRange,
+		},
+		{
+			name:          "sqrt below min",
+			body:          `{"op":"sqrt","a":-101}`,
 			wantStatus:    http.StatusUnprocessableEntity,
 			wantErrorCode: handler.ErrCodeOperandOutOfRange,
 		},

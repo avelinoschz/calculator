@@ -81,6 +81,12 @@ h1 {
   margin-bottom: var(--field-margin);
 }
 
+.helper-text {
+  margin: -0.5rem 0 1rem;
+  font-size: var(--font-label);
+  color: var(--color-label);
+}
+
 label {
   font-size: var(--font-label);
   font-weight: 500;

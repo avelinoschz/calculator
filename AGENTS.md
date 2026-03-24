@@ -174,6 +174,16 @@ At each step:
 - ensure tests pass
 - avoid partial or broken states
 
+## Completion Gate
+
+Before considering any feature, bug fix, or refactor done, run the full
+lint and test suite:
+
+    make lint test
+
+Do not rely on partial runs or assume passing sub-steps imply overall
+correctness. A change is not complete until this gate passes cleanly.
+
 ## Trade-off Philosophy
 
 Prefer:

@@ -8,7 +8,8 @@ Small full-stack calculator built with Go (`net/http`) and React + TypeScript.
 
 The project is intentionally narrow in scope:
 
-- four operations: add, subtract, multiply, divide
+- seven operations: add, subtract, multiply, divide, power, sqrt,
+  percentage
 - one calculation endpoint: `POST /api/v1/calculations`
 - one health endpoint: `GET /health`
 - backend-enforced operand limits via `CALC_MIN` / `CALC_MAX`
@@ -78,13 +79,21 @@ Quick example:
 ```sh
 curl -s -X POST http://localhost:8080/api/v1/calculations \
   -H 'Content-Type: application/json' \
-  -d '{"op":"divide","a":10,"b":3}'
+  -d '{"op":"power","a":2,"b":3}'
 ```
 
 ```json
 {
-  "result": 3.3333333333333335
+  "result": 8
 }
+```
+
+Unary example:
+
+```sh
+curl -s -X POST http://localhost:8080/api/v1/calculations \
+  -H 'Content-Type: application/json' \
+  -d '{"op":"sqrt","a":9}'
 ```
 
 Error shape:
@@ -101,9 +110,12 @@ Error shape:
 Validation notes:
 
 - malformed JSON, extra fields, and trailing payloads return `400 INVALID_REQUEST`
-- missing `op`, `a`, or `b` returns `400 MISSING_FIELD`
+- missing `op` or `a`, and missing `b` for binary operations, return `400 MISSING_FIELD`
 - unsupported operations return `400 INVALID_OPERATION`
+- `sqrt` rejects a second operand with `400 INVALID_REQUEST`
 - division by zero returns `422 DIVISION_BY_ZERO`
+- negative square root returns `422 NEGATIVE_SQUARE_ROOT`
+- non-finite results return `422 NON_FINITE_RESULT`
 - configured operand-limit violations return `422 OPERAND_OUT_OF_RANGE`
 
 ## Make Targets
@@ -120,8 +132,8 @@ make help
 | `make run` | Run backend and frontend locally in parallel |
 | `make test` | Run all tests |
 | `make coverage` | Run all tests with coverage reports |
-| `make lint` | Run all linters |
-| `make format` | Auto-fix lint issues |
+| `make lint` | Run all linters (use `FIX=1` to auto-fix) |
+| `make format` | Format source files (Go: `go fmt`, frontend: Prettier) |
 | `make build` | Build backend binary and frontend assets |
 | `make clean` | Remove build artifacts |
 | `make docker.build` | Build both Docker images |
@@ -145,6 +157,7 @@ specs/      Requirements, API guide, and implementation plan
 - business logic lives in `backend/internal/calculator`, separate from HTTP handling
 - frontend API calls are isolated in `frontend/src/api/`
 - validation happens on both sides, with the backend as the source of truth
+- unary and binary operations share one endpoint with explicit request schemas
 - Docker images are multi-stage and self-contained
 - CI runs lint, test, and build through the documented Make targets
 
@@ -156,5 +169,6 @@ The repo also includes historical process and design artifacts:
 - `docs/adr/0002-tooling-and-delivery.md`
 - `docs/adr/0003-frontend-architecture.md`
 - `docs/adr/0004-environment-variables-for-configuration.md`
+- `docs/adr/0005-operation-arity-and-finite-result-handling.md`
 - `specs/calculator/plan.md`
 - `docs/ai-prompts.md`

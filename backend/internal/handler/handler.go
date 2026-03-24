@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"math"
 	"net/http"
+	"strings"
 
 	"github.com/avelinoschz/calculator/backend/internal/calculator"
 )
@@ -39,34 +40,66 @@ func (h *Handler) Calculate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	op := calculator.Operation(*req.Operation)
+	if !op.IsSupported() {
+		writeError(w, http.StatusBadRequest, ErrCodeInvalidOperation, invalidOperationMessage())
+		return
+	}
+
 	if req.A == nil {
 		writeMissingField(w, "a")
 		return
 	}
 
-	if req.B == nil {
-		writeMissingField(w, "b")
-		return
-	}
-
-	op := *req.Operation
 	a := *req.A
-	b := *req.B
 
-	if a < h.Min || a > h.Max || b < h.Min || b > h.Max {
+	if a < h.Min || a > h.Max {
 		writeError(w, http.StatusUnprocessableEntity, ErrCodeOperandOutOfRange,
 			formatOperandRangeMessage(h.Min, h.Max))
 		return
 	}
 
-	result, calcErr := calculator.Calculate(calculator.Operation(op), a, b)
+	var result float64
+	var calcErr error
+
+	if op.RequiresSecondOperand() {
+		if req.B == nil {
+			writeMissingField(w, "b")
+			return
+		}
+
+		b := *req.B
+		if b < h.Min || b > h.Max {
+			writeError(w, http.StatusUnprocessableEntity, ErrCodeOperandOutOfRange,
+				formatOperandRangeMessage(h.Min, h.Max))
+			return
+		}
+
+		result, calcErr = calculator.CalculateBinary(op, a, b)
+	} else {
+		if req.B != nil {
+			writeError(w, http.StatusBadRequest, ErrCodeInvalidRequest, "b is not allowed for sqrt")
+			return
+		}
+
+		result, calcErr = calculator.CalculateUnary(op, a)
+	}
+
 	if calcErr != nil {
 		if errors.Is(calcErr, calculator.ErrInvalidOperation) {
-			writeError(w, http.StatusBadRequest, ErrCodeInvalidOperation, "operation must be one of add, subtract, multiply, divide")
+			writeError(w, http.StatusBadRequest, ErrCodeInvalidOperation, invalidOperationMessage())
 			return
 		}
 		if errors.Is(calcErr, calculator.ErrDivisionByZero) {
 			writeError(w, http.StatusUnprocessableEntity, ErrCodeDivisionByZero, "division by zero is not allowed")
+			return
+		}
+		if errors.Is(calcErr, calculator.ErrNegativeSquareRoot) {
+			writeError(w, http.StatusUnprocessableEntity, ErrCodeNegativeSquareRoot, "square root is only defined for non-negative numbers")
+			return
+		}
+		if errors.Is(calcErr, calculator.ErrNonFiniteResult) {
+			writeError(w, http.StatusUnprocessableEntity, ErrCodeNonFiniteResult, "calculation result is not a finite real number")
 			return
 		}
 		slog.Error("unexpected calculation error", "error", calcErr)
@@ -74,7 +107,12 @@ func (h *Handler) Calculate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slog.Info("calculation completed", "operation", op, "a", a, "b", b, "result", result)
+	logAttrs := []any{"operation", op, "a", a, "result", result}
+	if req.B != nil {
+		logAttrs = append(logAttrs, "b", *req.B)
+	}
+
+	slog.Info("calculation completed", logAttrs...)
 	writeJSON(w, http.StatusOK, CalculateResponse{Result: result})
 }
 
@@ -130,4 +168,13 @@ func writeJSON(w http.ResponseWriter, status int, body any) {
 	if err := json.NewEncoder(w).Encode(body); err != nil {
 		slog.Error("failed to write response", "error", err)
 	}
+}
+
+func invalidOperationMessage() string {
+	operations := make([]string, 0, len(calculator.SupportedOperations()))
+	for _, op := range calculator.SupportedOperations() {
+		operations = append(operations, string(op))
+	}
+
+	return fmt.Sprintf("operation must be one of %s", strings.Join(operations, ", "))
 }

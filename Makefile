@@ -77,11 +77,11 @@ coverage: backend.coverage frontend.coverage ## Run all tests with coverage repo
 
 # ── Lint ──────────────────────────────────────────────────────────────────────
 
-backend.lint: ## Run golangci-lint
-	cd backend && $(INSTALL_BIN_DIR)/golangci-lint run ./...
+backend.lint: ## Run golangci-lint (use FIX=1 to auto-fix)
+	cd backend && $(INSTALL_BIN_DIR)/golangci-lint run $(if $(FIX),--fix) ./...
 
-frontend.lint: ## Run ESLint
-	cd frontend && npm run lint
+frontend.lint: ## Run ESLint (use FIX=1 to auto-fix)
+	cd frontend && npm run lint $(if $(FIX),-- --fix)
 
 docs.lint: ## Run markdownlint on all markdown files
 	./node_modules/.bin/markdownlint --ignore '**/node_modules/**' '**/*.md'
@@ -90,11 +90,11 @@ lint: backend.lint frontend.lint docs.lint ## Run all linters
 
 # ── Format ────────────────────────────────────────────────────────────────────
 
-backend.format: ## Auto-fix Go lint issues
-	cd backend && $(INSTALL_BIN_DIR)/golangci-lint run --fix ./...
+backend.format: ## Format Go source files (go fmt)
+	cd backend && go fmt ./...
 
-frontend.format: ## Auto-fix frontend lint issues
-	cd frontend && npm run lint -- --fix
+frontend.format: ## Format frontend source files (Prettier)
+	cd frontend && npx prettier --write src/
 
 format: backend.format frontend.format ## Auto-fix all lint issues
 

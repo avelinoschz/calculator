@@ -5,8 +5,7 @@ info:
   description: |
     Minimal REST API for calculator operations.
 
-    This API is intentionally small and designed for a take-home assessment
-    with maintainability and clarity as primary goals.
+    This API is intentionally small and designed with maintainability and clarity as primary goals.
 
 servers:
   - url: http://localhost:8080
@@ -63,12 +62,29 @@ paths:
                   op: add
                   a: 10
                   b: 5
+              power:
+                summary: Exponentiation example
+                value:
+                  op: power
+                  a: 2
+                  b: 3
               division:
                 summary: Division example
                 value:
                   op: divide
                   a: 20
                   b: 4
+              squareRoot:
+                summary: Square root example
+                value:
+                  op: sqrt
+                  a: 9
+              percentage:
+                summary: Percentage example
+                value:
+                  op: percentage
+                  a: 10
+                  b: 200
       responses:
         '200':
           description: Successful calculation result
@@ -96,7 +112,12 @@ paths:
                   value:
                     error:
                       code: INVALID_OPERATION
-                      message: operation must be one of add, subtract, multiply, divide
+                      message: operation must be one of add, subtract, multiply, divide, power, sqrt, percentage
+                invalidUnaryOperand:
+                  value:
+                    error:
+                      code: INVALID_REQUEST
+                      message: b is not allowed for sqrt
                 malformedRequest:
                   value:
                     error:
@@ -114,6 +135,16 @@ paths:
                     error:
                       code: DIVISION_BY_ZERO
                       message: division by zero is not allowed
+                negativeSquareRoot:
+                  value:
+                    error:
+                      code: NEGATIVE_SQUARE_ROOT
+                      message: square root is only defined for non-negative numbers
+                nonFiniteResult:
+                  value:
+                    error:
+                      code: NON_FINITE_RESULT
+                      message: calculation result is not a finite real number
                 operandOutOfRange:
                   value:
                     error:
@@ -135,6 +166,11 @@ paths:
 components:
   schemas:
     CalculateRequest:
+      oneOf:
+        - $ref: '#/components/schemas/BinaryCalculateRequest'
+        - $ref: '#/components/schemas/UnaryCalculateRequest'
+
+    BinaryCalculateRequest:
       type: object
       additionalProperties: false
       required:
@@ -150,6 +186,8 @@ components:
             - subtract
             - multiply
             - divide
+            - power
+            - percentage
         a:
           type: number
           format: double
@@ -158,6 +196,23 @@ components:
           type: number
           format: double
           description: Second operand
+
+    UnaryCalculateRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - op
+        - a
+      properties:
+        op:
+          type: string
+          description: Calculator operation to execute
+          enum:
+            - sqrt
+        a:
+          type: number
+          format: double
+          description: Unary operand
 
     CalculateResponse:
       type: object

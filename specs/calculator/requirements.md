@@ -17,6 +17,9 @@ engineering practices.
   - Subtraction
   - Multiplication
   - Division
+  - Exponentiation
+  - Square root
+  - Percentage
 - Support configurable operand limits (min/max) via environment variables
   (`CALC_MIN`, `CALC_MAX` on the backend; `VITE_CALC_MIN`, `VITE_CALC_MAX`
   on the frontend). When unset, no limit is applied.
@@ -77,7 +80,9 @@ engineering practices.
 
 - `GET /health` → `{ "status": "ok" }` (200)
 - `POST /api/v1/calculations`
-  - Request: `{ "op": string, "a": number, "b": number }`
+  - Request:
+    - Binary operations: `{ "op": string, "a": number, "b": number }`
+    - Unary operations: `{ "op": string, "a": number }`
   - Success (200): `{ "result": number }`
   - Error: `{ "error": { "code": string, "message": string } }`
 
@@ -87,7 +92,7 @@ engineering practices.
 | ------ | ------- |
 | 200 | Successful calculation |
 | 400 | Invalid/malformed request, unknown operation, missing field |
-| 422 | Division by zero; operand outside configured limits |
+| 422 | Division by zero; mathematically invalid input; operand outside configured limits |
 | 500 | Internal server error |
 
 ### Error Codes
@@ -96,14 +101,19 @@ engineering practices.
 | ---- | ------- |
 | `INVALID_REQUEST` | Malformed JSON or unparseable body |
 | `MISSING_FIELD` | Required field absent from request |
-| `INVALID_OPERATION` | `op` value is not one of the four supported operations |
+| `INVALID_OPERATION` | `op` value is not one of the supported operations |
 | `DIVISION_BY_ZERO` | `b` is zero when `op` is `divide` |
+| `NEGATIVE_SQUARE_ROOT` | `a` is negative when `op` is `sqrt` |
+| `NON_FINITE_RESULT` | The operation would produce `NaN` or `Inf` |
 | `OPERAND_OUT_OF_RANGE` | `a` or `b` is outside the configured min/max range |
 | `INTERNAL_ERROR` | Unexpected server-side failure |
 
 ### Schema Constraints
 
 - `additionalProperties: false` — extra fields in the request body are rejected
+- unary and binary operations have distinct request schemas
+- `sqrt` requires `a` and rejects `b`
+- `power` and `percentage` require both `a` and `b`
 
 ## Dev & Tooling Requirements
 
@@ -175,9 +185,6 @@ Note: Full CD (deployment) is not required.
 These items are lower priority and should only be implemented if the
 core scope is complete:
 
-- Exponentiation
-- Square root
-- Percentage
 - Local observability support:
   - OpenTelemetry tracing
   - Jaeger integration
@@ -212,6 +219,7 @@ core scope is complete:
 - The frontend displays the result clearly
 - Invalid input is rejected with a helpful error message
 - Division by zero is handled safely and clearly
+- Negative square root is handled safely and clearly
 - Operands outside the configured limits are rejected with a clear error
 
 ### Non-Functional

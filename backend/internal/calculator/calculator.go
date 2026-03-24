@@ -1,15 +1,21 @@
 package calculator
 
-import "errors"
+import (
+	"errors"
+	"math"
+)
 
 // Operation represents a supported calculator operation.
 type Operation string
 
 const (
-	OperationAdd      Operation = "add"
-	OperationSubtract Operation = "subtract"
-	OperationMultiply Operation = "multiply"
-	OperationDivide   Operation = "divide"
+	OperationAdd        Operation = "add"
+	OperationSubtract   Operation = "subtract"
+	OperationMultiply   Operation = "multiply"
+	OperationDivide     Operation = "divide"
+	OperationPower      Operation = "power"
+	OperationSqrt       Operation = "sqrt"
+	OperationPercentage Operation = "percentage"
 )
 
 // ErrInvalidOperation is returned when the operation is not supported.
@@ -18,21 +24,102 @@ var ErrInvalidOperation = errors.New("invalid operation")
 // ErrDivisionByZero is returned when dividing by zero.
 var ErrDivisionByZero = errors.New("division by zero")
 
-// Calculate performs the given operation on operands a and b.
-func Calculate(op Operation, a, b float64) (float64, error) {
+// ErrNegativeSquareRoot is returned when taking the square root of a negative number.
+var ErrNegativeSquareRoot = errors.New("negative square root")
+
+// ErrNonFiniteResult is returned when an operation produces NaN or Inf.
+var ErrNonFiniteResult = errors.New("non-finite result")
+
+// SupportedOperations returns the stable, public list of supported operations.
+func SupportedOperations() []Operation {
+	return []Operation{
+		OperationAdd,
+		OperationSubtract,
+		OperationMultiply,
+		OperationDivide,
+		OperationPower,
+		OperationSqrt,
+		OperationPercentage,
+	}
+}
+
+// RequiresSecondOperand reports whether the operation is binary.
+func (op Operation) RequiresSecondOperand() bool {
+	switch op {
+	case OperationAdd,
+		OperationSubtract,
+		OperationMultiply,
+		OperationDivide,
+		OperationPower,
+		OperationPercentage:
+		return true
+	default:
+		return false
+	}
+}
+
+// IsSupported reports whether the operation is recognized.
+func (op Operation) IsSupported() bool {
+	for _, supported := range SupportedOperations() {
+		if op == supported {
+			return true
+		}
+	}
+	return false
+}
+
+// CalculateBinary performs the given binary operation on operands a and b.
+func CalculateBinary(op Operation, a, b float64) (float64, error) {
+	var result float64
+
 	switch op {
 	case OperationAdd:
-		return a + b, nil
+		result = a + b
 	case OperationSubtract:
-		return a - b, nil
+		result = a - b
 	case OperationMultiply:
-		return a * b, nil
+		result = a * b
 	case OperationDivide:
 		if b == 0 {
 			return 0, ErrDivisionByZero
 		}
-		return a / b, nil
+		result = a / b
+	case OperationPower:
+		result = math.Pow(a, b)
+	case OperationPercentage:
+		result = (a / 100) * b
 	default:
 		return 0, ErrInvalidOperation
 	}
+
+	if !isFinite(result) {
+		return 0, ErrNonFiniteResult
+	}
+
+	return result, nil
+}
+
+// CalculateUnary performs the given unary operation on operand a.
+func CalculateUnary(op Operation, a float64) (float64, error) {
+	var result float64
+
+	switch op {
+	case OperationSqrt:
+		if a < 0 {
+			return 0, ErrNegativeSquareRoot
+		}
+		result = math.Sqrt(a)
+	default:
+		return 0, ErrInvalidOperation
+	}
+
+	if !isFinite(result) {
+		return 0, ErrNonFiniteResult
+	}
+
+	return result, nil
+}
+
+func isFinite(value float64) bool {
+	return !math.IsNaN(value) && !math.IsInf(value, 0)
 }
