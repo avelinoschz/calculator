@@ -70,7 +70,9 @@ Supported operations:
 | `make frontend.lint` | Run ESLint (use `FIX=1` to auto-fix) |
 | `make frontend.format` | Format frontend source files (Prettier) |
 | `make frontend.build` | Build `frontend/dist/` |
-| `make frontend.clean` | Remove frontend build artifacts |
+| `make frontend.clean` | Remove all frontend build artifacts |
+| `make frontend.clean.dist` | Remove only the build output (`frontend/dist/`) |
+| `make frontend.clean.coverage` | Remove only the coverage report (`frontend/coverage/`) |
 | `make frontend.docker.build` | Build the frontend Docker image |
 
 ## Testing

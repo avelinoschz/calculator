@@ -124,7 +124,9 @@ contract.
 | `make backend.lint` | Run `golangci-lint` (use `FIX=1` to auto-fix) |
 | `make backend.format` | Format Go source files (`go fmt`) |
 | `make backend.build` | Build `backend/bin/server` |
-| `make backend.clean` | Remove backend build artifacts |
+| `make backend.clean` | Remove all backend build artifacts |
+| `make backend.clean.bin` | Remove only the backend binary (`backend/bin/`) |
+| `make backend.clean.coverage` | Remove only coverage files (`coverage.out`, `coverage.html`) |
 | `make backend.docker.build` | Build the backend Docker image |
 
 ## Testing and Linting

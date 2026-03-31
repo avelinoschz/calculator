@@ -18,7 +18,9 @@ export VERSION
 	backend.lint frontend.lint docs.lint lint \
 	backend.format frontend.format format \
 	backend.build frontend.build build \
-	backend.clean frontend.clean clean \
+	backend.clean.bin backend.clean.coverage backend.clean \
+	frontend.clean.dist frontend.clean.coverage frontend.clean \
+	clean.bin clean \
 	backend.docker.build frontend.docker.build docker.build \
 	backend.docker.run frontend.docker.run \
 	up down
@@ -137,11 +139,23 @@ frontend.docker.run: ## Run the frontend service via Docker Compose
 
 # ── Clean ─────────────────────────────────────────────────────────────────────
 
-backend.clean: ## Remove backend build artifacts (backend/bin/, coverage files)
-	rm -rf backend/bin backend/coverage.out backend/coverage.html
+backend.clean.bin: ## Remove backend binary (backend/bin/)
+	rm -rf backend/bin
 
-frontend.clean: ## Remove frontend build artifacts (frontend/dist/, frontend/coverage/)
-	rm -rf frontend/dist frontend/coverage
+backend.clean.coverage: ## Remove backend coverage files (coverage.out, coverage.html)
+	rm -f backend/coverage.out backend/coverage.html
 
-clean: backend.clean frontend.clean ## Remove all build artifacts and installed tools (bin/)
+backend.clean: backend.clean.bin backend.clean.coverage ## Remove all backend build artifacts
+
+frontend.clean.dist: ## Remove frontend build output (frontend/dist/)
+	rm -rf frontend/dist
+
+frontend.clean.coverage: ## Remove frontend coverage report (frontend/coverage/)
+	rm -rf frontend/coverage
+
+frontend.clean: frontend.clean.dist frontend.clean.coverage ## Remove all frontend build artifacts
+
+clean.bin: ## Remove installed tools (bin/)
 	rm -rf bin
+
+clean: backend.clean frontend.clean clean.bin ## Remove all build artifacts and installed tools

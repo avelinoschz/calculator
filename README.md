@@ -135,7 +135,8 @@ make help
 | `make lint` | Run all linters (use `FIX=1` to auto-fix) |
 | `make format` | Format source files (Go: `go fmt`, frontend: Prettier) |
 | `make build` | Build backend binary and frontend assets |
-| `make clean` | Remove build artifacts |
+| `make clean` | Remove all build artifacts and installed tools |
+| `make clean.bin` | Remove only installed tools (`bin/`) |
 | `make docker.build` | Build both Docker images |
 | `make up` | Start the full stack with Docker Compose |
 | `make down` | Stop the full stack |
