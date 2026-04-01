@@ -13,12 +13,41 @@ import (
 	"github.com/avelinoschz/calculator/backend/internal/calculator"
 )
 
+// CalculatorService defines the calculation behavior the HTTP layer depends on.
+// It is intentionally small so handler tests can mock the service boundary.
+type CalculatorService interface {
+	Calculate(op calculator.Operation, a float64, b *float64) (float64, error)
+}
+
 // Handler holds configuration for the calculate endpoint.
 type Handler struct {
 	// Min and Max define the allowed range for operands.
 	// Use math.Inf(-1) and math.Inf(1) for no limits (the defaults).
 	Min float64
 	Max float64
+
+	Service CalculatorService
+}
+
+// New creates a Handler with the default calculator service when one is not supplied.
+func New(min, max float64, service CalculatorService) *Handler {
+	if service == nil {
+		service = calculator.Service{}
+	}
+
+	return &Handler{
+		Min:     min,
+		Max:     max,
+		Service: service,
+	}
+}
+
+func (h *Handler) service() CalculatorService {
+	if h.Service == nil {
+		h.Service = calculator.Service{}
+	}
+
+	return h.Service
 }
 
 // Health handles GET /health.
@@ -61,6 +90,7 @@ func (h *Handler) Calculate(w http.ResponseWriter, r *http.Request) {
 
 	var result float64
 	var calcErr error
+	var secondOperand *float64
 
 	if op.RequiresSecondOperand() {
 		if req.B == nil {
@@ -74,16 +104,15 @@ func (h *Handler) Calculate(w http.ResponseWriter, r *http.Request) {
 				formatOperandRangeMessage(h.Min, h.Max))
 			return
 		}
-
-		result, calcErr = calculator.CalculateBinary(op, a, b)
+		secondOperand = &b
 	} else {
 		if req.B != nil {
 			writeError(w, http.StatusBadRequest, ErrCodeInvalidRequest, "b is not allowed for sqrt")
 			return
 		}
-
-		result, calcErr = calculator.CalculateUnary(op, a)
 	}
+
+	result, calcErr = h.service().Calculate(op, a, secondOperand)
 
 	if calcErr != nil {
 		if errors.Is(calcErr, calculator.ErrInvalidOperation) {

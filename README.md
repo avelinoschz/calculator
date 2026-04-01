@@ -40,17 +40,33 @@ The two main process artifacts are:
 
 - `specs/calculator/plan.md` — the phased execution guide used during
   development
-- `docs/ai-prompts.md` — archived representative prompts preserved from
-  that workflow
+- `docs/ai-prompts.md` — representative prompts preserved from that
+  workflow
+
+The repo now also includes local AI workflow artifacts under `.agents/`:
+
+- reusable skills in `.agents/skills/` for spec review, backend changes,
+  final validation, lint fixing, and commit suggestion
+- agent roles in `.agents/agents/` for planning, backend work, and review
+
+These are intentionally small and repo-specific. They capture practical
+skills, sub-agent responsibilities, and context boundaries for work in
+this repository.
+
+See `.agents/README.md` for the purpose of the skills, the sub-agent
+roles, and suggested MCP categories that fit this repository.
 
 ## Run
 
 Prerequisites:
 
-- Go 1.25+
-- Node.js 20+
+- Go 1.26+
+- Node.js 24+
 - npm
 - Docker with Compose v2 for containerized usage
+
+If you use `asdf`, the repository pins the recommended local toolchain in
+`.tool-versions`.
 
 Local development:
 
@@ -135,6 +151,7 @@ make help
 | `make lint` | Run all linters (use `FIX=1` to auto-fix) |
 | `make format` | Format source files (Go: `go fmt`, frontend: Prettier) |
 | `make build` | Build backend binary and frontend assets |
+| `make ci` | Run the full validation gate: lint, test, and build |
 | `make clean` | Remove all build artifacts and installed tools |
 | `make clean.bin` | Remove only installed tools (`bin/`) |
 | `make docker.build` | Build both Docker images |
@@ -149,6 +166,7 @@ Per-service targets are documented in `backend/README.md` and `frontend/README.m
 backend/    Go API server
 frontend/   React + TypeScript UI
 api/        OpenAPI contract
+.agents/    Repo-local skills and agent roles
 docs/adr/   Architecture and tooling decisions
 specs/      Requirements, API guide, and implementation plan
 ```
@@ -156,6 +174,8 @@ specs/      Requirements, API guide, and implementation plan
 ## Design Summary
 
 - business logic lives in `backend/internal/calculator`, separate from HTTP handling
+- the HTTP layer depends on a small calculator service interface so
+  handler tests can mock the layer boundary explicitly
 - frontend API calls are isolated in `frontend/src/api/`
 - validation happens on both sides, with the backend as the source of truth
 - unary and binary operations share one endpoint with explicit request schemas

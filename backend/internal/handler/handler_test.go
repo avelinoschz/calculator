@@ -3,6 +3,7 @@ package handler_test
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"math"
 	"net/http"
 	"net/http/httptest"
@@ -11,11 +12,37 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/avelinoschz/calculator/backend/internal/calculator"
 	"github.com/avelinoschz/calculator/backend/internal/handler"
 )
 
 func noLimitsHandler() *handler.Handler {
-	return &handler.Handler{Min: math.Inf(-1), Max: math.Inf(1)}
+	return handler.New(math.Inf(-1), math.Inf(1), nil)
+}
+
+type mockCalculatorService struct {
+	t            *testing.T
+	wantOp       calculator.Operation
+	wantA        float64
+	wantB        *float64
+	returnResult float64
+	returnErr    error
+	called       bool
+}
+
+func (m *mockCalculatorService) Calculate(op calculator.Operation, a float64, b *float64) (float64, error) {
+	m.called = true
+	assert.Equal(m.t, m.wantOp, op)
+	assert.InDelta(m.t, m.wantA, a, 1e-9)
+
+	if m.wantB == nil {
+		assert.Nil(m.t, b)
+	} else {
+		require.NotNil(m.t, b)
+		assert.InDelta(m.t, *m.wantB, *b, 1e-9)
+	}
+
+	return m.returnResult, m.returnErr
 }
 
 func TestHealth(t *testing.T) {
@@ -185,7 +212,7 @@ func TestCalculateHandler(t *testing.T) {
 }
 
 func TestCalculateHandlerOperandLimits(t *testing.T) {
-	h := &handler.Handler{Min: -100, Max: 100}
+	h := handler.New(-100, 100, nil)
 
 	tests := []struct {
 		name          string
@@ -263,6 +290,77 @@ func TestCalculateHandlerOperandLimits(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCalculateHandlerUsesInjectedService(t *testing.T) {
+	service := &mockCalculatorService{
+		t:            t,
+		wantOp:       calculator.OperationAdd,
+		wantA:        10,
+		wantB:        ptr(5),
+		returnResult: 15,
+	}
+	h := handler.New(math.Inf(-1), math.Inf(1), service)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculations", bytes.NewBufferString(`{"op":"add","a":10,"b":5}`))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	h.Calculate(rec, req)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+
+	var resp handler.CalculateResponse
+	require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
+	assert.InDelta(t, 15.0, resp.Result, 1e-9)
+	assert.True(t, service.called)
+}
+
+func TestCalculateHandlerMapsInjectedServiceErrors(t *testing.T) {
+	service := &mockCalculatorService{
+		t:         t,
+		wantOp:    calculator.OperationDivide,
+		wantA:     10,
+		wantB:     ptr(0),
+		returnErr: calculator.ErrDivisionByZero,
+	}
+	h := handler.New(math.Inf(-1), math.Inf(1), service)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculations", bytes.NewBufferString(`{"op":"divide","a":10,"b":0}`))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	h.Calculate(rec, req)
+
+	assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+	var resp handler.ErrorResponse
+	require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
+	assert.Equal(t, handler.ErrCodeDivisionByZero, resp.Error.Code)
+	assert.True(t, service.called)
+}
+
+func TestCalculateHandlerReturnsInternalErrorForUnexpectedServiceFailure(t *testing.T) {
+	service := &mockCalculatorService{
+		t:         t,
+		wantOp:    calculator.OperationSqrt,
+		wantA:     9,
+		returnErr: errors.New("boom"),
+	}
+	h := handler.New(math.Inf(-1), math.Inf(1), service)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculations", bytes.NewBufferString(`{"op":"sqrt","a":9}`))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	h.Calculate(rec, req)
+
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
+
+	var resp handler.ErrorResponse
+	require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
+	assert.Equal(t, handler.ErrCodeInternalError, resp.Error.Code)
+	assert.True(t, service.called)
 }
 
 func ptr(f float64) *float64 { return &f }

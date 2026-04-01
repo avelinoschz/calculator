@@ -22,10 +22,11 @@ func main() {
 	slog.SetDefault(logger)
 	slog.Info("starting", "version", version)
 
-	h := &handler.Handler{
-		Min: parseEnvFloat("CALC_MIN", math.Inf(-1)),
-		Max: parseEnvFloat("CALC_MAX", math.Inf(1)),
-	}
+	h := handler.New(
+		parseEnvFloat("CALC_MIN", math.Inf(-1)),
+		parseEnvFloat("CALC_MAX", math.Inf(1)),
+		nil,
+	)
 
 	if !math.IsInf(h.Min, -1) || !math.IsInf(h.Max, 1) {
 		slog.Info("operand limits configured", "min", h.Min, "max", h.Max)

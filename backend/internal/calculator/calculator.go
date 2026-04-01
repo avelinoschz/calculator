@@ -123,3 +123,19 @@ func CalculateUnary(op Operation, a float64) (float64, error) {
 func isFinite(value float64) bool {
 	return !math.IsNaN(value) && !math.IsInf(value, 0)
 }
+
+// Service exposes the calculator domain through a small concrete type that
+// can satisfy consumer-defined interfaces.
+type Service struct{}
+
+// Calculate executes the requested operation using the domain functions.
+func (Service) Calculate(op Operation, a float64, b *float64) (float64, error) {
+	if op.RequiresSecondOperand() {
+		if b == nil {
+			return 0, ErrInvalidOperation
+		}
+		return CalculateBinary(op, a, *b)
+	}
+
+	return CalculateUnary(op, a)
+}
