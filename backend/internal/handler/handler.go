@@ -6,12 +6,34 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"math"
 	"net/http"
 	"strings"
 
 	"github.com/avelinoschz/calculator/backend/internal/calculator"
 )
+
+// CalculateRequest is the expected request body for POST /api/v1/calculations.
+type CalculateRequest struct {
+	Operation *string  `json:"op"`
+	A         *float64 `json:"a"`
+	B         *float64 `json:"b"`
+}
+
+// CalculateResponse is the success response body.
+type CalculateResponse struct {
+	Result float64 `json:"result"`
+}
+
+// ErrorDetail contains a machine-readable code and a human-readable message.
+type ErrorDetail struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// ErrorResponse is the consistent error response body.
+type ErrorResponse struct {
+	Error ErrorDetail `json:"error"`
+}
 
 // CalculatorService defines the calculation behavior the HTTP layer depends on.
 // It is intentionally small so handler tests can mock the service boundary.
@@ -21,33 +43,12 @@ type CalculatorService interface {
 
 // Handler holds configuration for the calculate endpoint.
 type Handler struct {
-	// Min and Max define the allowed range for operands.
-	// Use math.Inf(-1) and math.Inf(1) for no limits (the defaults).
-	Min float64
-	Max float64
-
-	Service CalculatorService
+	service CalculatorService
 }
 
-// New creates a Handler with the default calculator service when one is not supplied.
-func New(min, max float64, service CalculatorService) *Handler {
-	if service == nil {
-		service = calculator.Service{}
-	}
-
-	return &Handler{
-		Min:     min,
-		Max:     max,
-		Service: service,
-	}
-}
-
-func (h *Handler) service() CalculatorService {
-	if h.Service == nil {
-		h.Service = calculator.Service{}
-	}
-
-	return h.Service
+// New creates a Handler with the given calculator service.
+func New(service CalculatorService) *Handler {
+	return &Handler{service: service}
 }
 
 // Health handles GET /health.
@@ -82,14 +83,6 @@ func (h *Handler) Calculate(w http.ResponseWriter, r *http.Request) {
 
 	a := *req.A
 
-	if a < h.Min || a > h.Max {
-		writeError(w, http.StatusUnprocessableEntity, ErrCodeOperandOutOfRange,
-			formatOperandRangeMessage(h.Min, h.Max))
-		return
-	}
-
-	var result float64
-	var calcErr error
 	var secondOperand *float64
 
 	if op.RequiresSecondOperand() {
@@ -99,40 +92,22 @@ func (h *Handler) Calculate(w http.ResponseWriter, r *http.Request) {
 		}
 
 		b := *req.B
-		if b < h.Min || b > h.Max {
-			writeError(w, http.StatusUnprocessableEntity, ErrCodeOperandOutOfRange,
-				formatOperandRangeMessage(h.Min, h.Max))
-			return
-		}
 		secondOperand = &b
 	} else {
 		if req.B != nil {
-			writeError(w, http.StatusBadRequest, ErrCodeInvalidRequest, "b is not allowed for sqrt")
+			writeError(w, http.StatusBadRequest, ErrCodeInvalidRequest,
+				fmt.Sprintf("b is not allowed for %s", op))
 			return
 		}
 	}
 
-	result, calcErr = h.service().Calculate(op, a, secondOperand)
-
+	result, calcErr := h.service.Calculate(op, a, secondOperand)
 	if calcErr != nil {
-		if errors.Is(calcErr, calculator.ErrInvalidOperation) {
-			writeError(w, http.StatusBadRequest, ErrCodeInvalidOperation, invalidOperationMessage())
-			return
+		status, code, msg := mapCalcError(calcErr)
+		if status == http.StatusInternalServerError {
+			slog.Error("unexpected calculation error", "error", calcErr)
 		}
-		if errors.Is(calcErr, calculator.ErrDivisionByZero) {
-			writeError(w, http.StatusUnprocessableEntity, ErrCodeDivisionByZero, "division by zero is not allowed")
-			return
-		}
-		if errors.Is(calcErr, calculator.ErrNegativeSquareRoot) {
-			writeError(w, http.StatusUnprocessableEntity, ErrCodeNegativeSquareRoot, "square root is only defined for non-negative numbers")
-			return
-		}
-		if errors.Is(calcErr, calculator.ErrNonFiniteResult) {
-			writeError(w, http.StatusUnprocessableEntity, ErrCodeNonFiniteResult, "calculation result is not a finite real number")
-			return
-		}
-		slog.Error("unexpected calculation error", "error", calcErr)
-		writeError(w, http.StatusInternalServerError, ErrCodeInternalError, "an unexpected error occurred")
+		writeError(w, status, code, msg)
 		return
 	}
 
@@ -163,22 +138,6 @@ func decodeCalculateRequest(r *http.Request) (CalculateRequest, error) {
 	}
 
 	return req, nil
-}
-
-func formatOperandRangeMessage(min, max float64) string {
-	if !math.IsInf(min, -1) && !math.IsInf(max, 1) {
-		return fmt.Sprintf("operands must be between %g and %g", min, max)
-	}
-
-	if !math.IsInf(min, -1) {
-		return fmt.Sprintf("operands must be at least %g", min)
-	}
-
-	if !math.IsInf(max, 1) {
-		return fmt.Sprintf("operands must be at most %g", max)
-	}
-
-	return "operands are outside the allowed range"
 }
 
 func writeMissingField(w http.ResponseWriter, field string) {

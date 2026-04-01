@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/avelinoschz/calculator/backend/internal/calculator"
 	"github.com/avelinoschz/calculator/backend/internal/handler"
 )
 
@@ -22,15 +23,20 @@ func main() {
 	slog.SetDefault(logger)
 	slog.Info("starting", "version", version)
 
-	h := handler.New(
-		parseEnvFloat("CALC_MIN", math.Inf(-1)),
-		parseEnvFloat("CALC_MAX", math.Inf(1)),
-		nil,
-	)
+	min := parseEnvFloat("CALC_MIN", math.Inf(-1))
+	max := parseEnvFloat("CALC_MAX", math.Inf(1))
 
-	if !math.IsInf(h.Min, -1) || !math.IsInf(h.Max, 1) {
-		slog.Info("operand limits configured", "min", h.Min, "max", h.Max)
+	svc, err := calculator.NewService(min, max)
+	if err != nil {
+		slog.Error("invalid service configuration", "error", err)
+		os.Exit(1)
 	}
+
+	if !math.IsInf(min, -1) || !math.IsInf(max, 1) {
+		slog.Info("operand limits configured", "min", min, "max", max)
+	}
+
+	h := handler.New(svc)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", handler.Health)

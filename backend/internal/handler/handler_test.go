@@ -3,7 +3,6 @@ package handler_test
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"math"
 	"net/http"
 	"net/http/httptest"
@@ -16,36 +15,33 @@ import (
 	"github.com/avelinoschz/calculator/backend/internal/handler"
 )
 
-func noLimitsHandler() *handler.Handler {
-	return handler.New(math.Inf(-1), math.Inf(1), nil)
+func noLimitsHandler(t *testing.T) *handler.Handler {
+	t.Helper()
+	svc, err := calculator.NewService(math.Inf(-1), math.Inf(1))
+	require.NoError(t, err)
+	return handler.New(svc)
 }
 
+// mockCalculatorService records calls and returns configured responses.
+// Assertions are performed in the test body, not inside the mock.
 type mockCalculatorService struct {
-	t            *testing.T
-	wantOp       calculator.Operation
-	wantA        float64
-	wantB        *float64
-	returnResult float64
-	returnErr    error
-	called       bool
+	calledOp calculator.Operation
+	calledA  float64
+	calledB  *float64
+	result   float64
+	err      error
 }
 
 func (m *mockCalculatorService) Calculate(op calculator.Operation, a float64, b *float64) (float64, error) {
-	m.called = true
-	assert.Equal(m.t, m.wantOp, op)
-	assert.InDelta(m.t, m.wantA, a, 1e-9)
-
-	if m.wantB == nil {
-		assert.Nil(m.t, b)
-	} else {
-		require.NotNil(m.t, b)
-		assert.InDelta(m.t, *m.wantB, *b, 1e-9)
-	}
-
-	return m.returnResult, m.returnErr
+	m.calledOp = op
+	m.calledA = a
+	m.calledB = b
+	return m.result, m.err
 }
 
 func TestHealth(t *testing.T) {
+	t.Parallel()
+
 	req := httptest.NewRequest(http.MethodGet, "/health", nil)
 	rec := httptest.NewRecorder()
 
@@ -60,6 +56,8 @@ func TestHealth(t *testing.T) {
 }
 
 func TestCalculateHandler(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name          string
 		body          string
@@ -113,7 +111,7 @@ func TestCalculateHandler(t *testing.T) {
 			name:          "division by zero",
 			body:          `{"op":"divide","a":10,"b":0}`,
 			wantStatus:    http.StatusUnprocessableEntity,
-			wantErrorCode: handler.ErrCodeDivisionByZero,
+			wantErrorCode: calculator.ErrDivisionByZero.Code(),
 		},
 		{
 			name:          "invalid operation",
@@ -125,13 +123,13 @@ func TestCalculateHandler(t *testing.T) {
 			name:          "negative square root",
 			body:          `{"op":"sqrt","a":-1}`,
 			wantStatus:    http.StatusUnprocessableEntity,
-			wantErrorCode: handler.ErrCodeNegativeSquareRoot,
+			wantErrorCode: calculator.ErrNegativeSquareRoot.Code(),
 		},
 		{
 			name:          "non finite result",
 			body:          `{"op":"power","a":1e308,"b":2}`,
 			wantStatus:    http.StatusUnprocessableEntity,
-			wantErrorCode: handler.ErrCodeNonFiniteResult,
+			wantErrorCode: calculator.ErrNonFiniteResult.Code(),
 		},
 		{
 			name:          "missing operation field",
@@ -183,9 +181,11 @@ func TestCalculateHandler(t *testing.T) {
 		},
 	}
 
-	h := noLimitsHandler()
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			h := noLimitsHandler(t)
+
 			req := httptest.NewRequest(http.MethodPost, "/api/v1/calculations", bytes.NewBufferString(tc.body))
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
@@ -212,7 +212,11 @@ func TestCalculateHandler(t *testing.T) {
 }
 
 func TestCalculateHandlerOperandLimits(t *testing.T) {
-	h := handler.New(-100, 100, nil)
+	t.Parallel()
+
+	svc, err := calculator.NewService(-100, 100)
+	require.NoError(t, err)
+	h := handler.New(svc)
 
 	tests := []struct {
 		name          string
@@ -243,30 +247,32 @@ func TestCalculateHandlerOperandLimits(t *testing.T) {
 			name:          "a below min",
 			body:          `{"op":"add","a":-101,"b":0}`,
 			wantStatus:    http.StatusUnprocessableEntity,
-			wantErrorCode: handler.ErrCodeOperandOutOfRange,
+			wantErrorCode: calculator.ErrOperandOutOfRange.Code(),
 		},
 		{
 			name:          "sqrt below min",
 			body:          `{"op":"sqrt","a":-101}`,
 			wantStatus:    http.StatusUnprocessableEntity,
-			wantErrorCode: handler.ErrCodeOperandOutOfRange,
+			wantErrorCode: calculator.ErrOperandOutOfRange.Code(),
 		},
 		{
 			name:          "b above max",
 			body:          `{"op":"add","a":0,"b":101}`,
 			wantStatus:    http.StatusUnprocessableEntity,
-			wantErrorCode: handler.ErrCodeOperandOutOfRange,
+			wantErrorCode: calculator.ErrOperandOutOfRange.Code(),
 		},
 		{
 			name:          "both operands out of range",
 			body:          `{"op":"add","a":-999,"b":999}`,
 			wantStatus:    http.StatusUnprocessableEntity,
-			wantErrorCode: handler.ErrCodeOperandOutOfRange,
+			wantErrorCode: calculator.ErrOperandOutOfRange.Code(),
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
 			req := httptest.NewRequest(http.MethodPost, "/api/v1/calculations", bytes.NewBufferString(tc.body))
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
@@ -293,14 +299,12 @@ func TestCalculateHandlerOperandLimits(t *testing.T) {
 }
 
 func TestCalculateHandlerUsesInjectedService(t *testing.T) {
-	service := &mockCalculatorService{
-		t:            t,
-		wantOp:       calculator.OperationAdd,
-		wantA:        10,
-		wantB:        ptr(5),
-		returnResult: 15,
+	t.Parallel()
+
+	svc := &mockCalculatorService{
+		result: 15,
 	}
-	h := handler.New(math.Inf(-1), math.Inf(1), service)
+	h := handler.New(svc)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculations", bytes.NewBufferString(`{"op":"add","a":10,"b":5}`))
 	req.Header.Set("Content-Type", "application/json")
@@ -313,18 +317,20 @@ func TestCalculateHandlerUsesInjectedService(t *testing.T) {
 	var resp handler.CalculateResponse
 	require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
 	assert.InDelta(t, 15.0, resp.Result, 1e-9)
-	assert.True(t, service.called)
+
+	assert.Equal(t, calculator.OperationAdd, svc.calledOp)
+	assert.InDelta(t, 10.0, svc.calledA, 1e-9)
+	require.NotNil(t, svc.calledB)
+	assert.InDelta(t, 5.0, *svc.calledB, 1e-9)
 }
 
 func TestCalculateHandlerMapsInjectedServiceErrors(t *testing.T) {
-	service := &mockCalculatorService{
-		t:         t,
-		wantOp:    calculator.OperationDivide,
-		wantA:     10,
-		wantB:     ptr(0),
-		returnErr: calculator.ErrDivisionByZero,
+	t.Parallel()
+
+	svc := &mockCalculatorService{
+		err: calculator.ErrDivisionByZero,
 	}
-	h := handler.New(math.Inf(-1), math.Inf(1), service)
+	h := handler.New(svc)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculations", bytes.NewBufferString(`{"op":"divide","a":10,"b":0}`))
 	req.Header.Set("Content-Type", "application/json")
@@ -336,18 +342,19 @@ func TestCalculateHandlerMapsInjectedServiceErrors(t *testing.T) {
 
 	var resp handler.ErrorResponse
 	require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
-	assert.Equal(t, handler.ErrCodeDivisionByZero, resp.Error.Code)
-	assert.True(t, service.called)
+	assert.Equal(t, calculator.ErrDivisionByZero.Code(), resp.Error.Code)
+	assert.Equal(t, calculator.ErrDivisionByZero.Error(), resp.Error.Message)
+
+	assert.Equal(t, calculator.OperationDivide, svc.calledOp)
 }
 
 func TestCalculateHandlerReturnsInternalErrorForUnexpectedServiceFailure(t *testing.T) {
-	service := &mockCalculatorService{
-		t:         t,
-		wantOp:    calculator.OperationSqrt,
-		wantA:     9,
-		returnErr: errors.New("boom"),
+	t.Parallel()
+
+	svc := &mockCalculatorService{
+		err: assert.AnError,
 	}
-	h := handler.New(math.Inf(-1), math.Inf(1), service)
+	h := handler.New(svc)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculations", bytes.NewBufferString(`{"op":"sqrt","a":9}`))
 	req.Header.Set("Content-Type", "application/json")
@@ -360,7 +367,6 @@ func TestCalculateHandlerReturnsInternalErrorForUnexpectedServiceFailure(t *test
 	var resp handler.ErrorResponse
 	require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
 	assert.Equal(t, handler.ErrCodeInternalError, resp.Error.Code)
-	assert.True(t, service.called)
 }
 
 func ptr(f float64) *float64 { return &f }

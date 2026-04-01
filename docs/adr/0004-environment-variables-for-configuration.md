@@ -103,9 +103,12 @@ that do not set these variables continue to work without modification.
 
 ### Trade-offs
 
-- Values are not validated at compile time; a malformed variable
-  (e.g. `CALC_MIN=abc`) falls back to the default and logs a warning
-  rather than failing fast at startup
+- Unparseable values (e.g. `CALC_MIN=abc`) fall back to the default and
+  log a warning rather than failing fast at startup — this is intentional
+  to preserve backward compatibility for deployments that omit these
+  variables. Structurally invalid configurations (e.g. `CALC_MIN` greater
+  than `CALC_MAX`, or NaN values) are caught by `calculator.NewService`
+  at startup and cause an immediate fatal error.
 - Frontend limits are baked in at build time (Vite inlines
   `VITE_CALC_*` during `npm run build`); changing them requires a
   frontend rebuild, unlike the backend which reads them on each start

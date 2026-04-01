@@ -19,12 +19,24 @@ with the recommended Go and Node.js versions for local development.
 ```text
 backend/
   cmd/server/              entry point, env config, graceful shutdown
-  internal/calculator/     calculation domain logic
+  internal/calculator/     calculation domain logic and concrete service
   internal/handler/        HTTP transport, request validation, JSON responses,
                            and a small service interface for handler-layer mocks
   Dockerfile               multi-stage build
   .golangci.yml            Go lint configuration
 ```
+
+## Layering Notes
+
+- `internal/calculator` is the authority for all business rules: operand
+  range validation, operation arity, and domain error definitions
+- `internal/handler` owns the `CalculatorService` interface (consumer
+  owns the interface) and is responsible only for parsing HTTP input,
+  delegating to the service, and mapping domain errors to HTTP responses
+- `internal/calculator.NewService(min, max)` validates configuration
+  invariants at construction time; invalid limits cause a startup failure
+- domain errors carry their own machine-readable code and message;
+  the handler maps them generically without per-error branching (see ADR 0006)
 
 ## Configuration
 
@@ -39,7 +51,9 @@ Optional environment variables:
 present.
 
 If a configured value cannot be parsed as a float, startup logs a warning
-and falls back to no limit on that side.
+and falls back to no limit on that side. If the parsed values are
+structurally invalid (e.g. `CALC_MIN` greater than `CALC_MAX`), the
+server exits with a fatal error at startup.
 
 ## API Behavior
 

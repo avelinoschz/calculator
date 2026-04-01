@@ -18,18 +18,6 @@ const (
 	OperationPercentage Operation = "percentage"
 )
 
-// ErrInvalidOperation is returned when the operation is not supported.
-var ErrInvalidOperation = errors.New("invalid operation")
-
-// ErrDivisionByZero is returned when dividing by zero.
-var ErrDivisionByZero = errors.New("division by zero")
-
-// ErrNegativeSquareRoot is returned when taking the square root of a negative number.
-var ErrNegativeSquareRoot = errors.New("negative square root")
-
-// ErrNonFiniteResult is returned when an operation produces NaN or Inf.
-var ErrNonFiniteResult = errors.New("non-finite result")
-
 // SupportedOperations returns the stable, public list of supported operations.
 func SupportedOperations() []Operation {
 	return []Operation{
@@ -68,8 +56,7 @@ func (op Operation) IsSupported() bool {
 	return false
 }
 
-// CalculateBinary performs the given binary operation on operands a and b.
-func CalculateBinary(op Operation, a, b float64) (float64, error) {
+func calculateBinary(op Operation, a, b float64) (float64, error) {
 	var result float64
 
 	switch op {
@@ -99,8 +86,7 @@ func CalculateBinary(op Operation, a, b float64) (float64, error) {
 	return result, nil
 }
 
-// CalculateUnary performs the given unary operation on operand a.
-func CalculateUnary(op Operation, a float64) (float64, error) {
+func calculateUnary(op Operation, a float64) (float64, error) {
 	var result float64
 
 	switch op {
@@ -126,16 +112,38 @@ func isFinite(value float64) bool {
 
 // Service exposes the calculator domain through a small concrete type that
 // can satisfy consumer-defined interfaces.
-type Service struct{}
+type Service struct {
+	min float64
+	max float64
+}
+
+// NewService creates a Service with the given operand limits.
+// Use math.Inf(-1) and math.Inf(1) for no limits.
+func NewService(min, max float64) (Service, error) {
+	if math.IsNaN(min) || math.IsNaN(max) {
+		return Service{}, errors.New("limits must not be NaN")
+	}
+	if min > max {
+		return Service{}, errors.New("min must not exceed max")
+	}
+	return Service{min: min, max: max}, nil
+}
 
 // Calculate executes the requested operation using the domain functions.
-func (Service) Calculate(op Operation, a float64, b *float64) (float64, error) {
+func (s Service) Calculate(op Operation, a float64, b *float64) (float64, error) {
+	if a < s.min || a > s.max {
+		return 0, newErrOperandOutOfRange(s.min, s.max)
+	}
+
 	if op.RequiresSecondOperand() {
 		if b == nil {
 			return 0, ErrInvalidOperation
 		}
-		return CalculateBinary(op, a, *b)
+		if *b < s.min || *b > s.max {
+			return 0, newErrOperandOutOfRange(s.min, s.max)
+		}
+		return calculateBinary(op, a, *b)
 	}
 
-	return CalculateUnary(op, a)
+	return calculateUnary(op, a)
 }
