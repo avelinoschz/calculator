@@ -24,7 +24,7 @@ Why:
 ### 2. Standardize workflows through the Makefile
 
 Common tasks are exposed through documented Make targets for setup, run,
-test, coverage, lint, build, and Docker flows.
+test, coverage, lint, build, `ci`, and Docker flows.
 
 Why:
 
@@ -41,6 +41,17 @@ Why:
 
 - avoids reliance on global tool installs
 - makes local and CI usage more repeatable
+
+### 3a. Pin the recommended local toolchain
+
+The repository includes a root `.tool-versions` file for the preferred
+Go and Node.js versions used in development.
+
+Why:
+
+- makes local setup more reproducible for contributors using `asdf`
+- reduces version drift across backend and frontend workflows
+- complements, rather than replaces, language-native manifests
 
 ### 4. Use multi-stage Docker images
 
@@ -65,7 +76,8 @@ Why:
 
 ### 6. Keep CI narrow and useful
 
-CI runs lint, test, and build using the documented Make targets.
+CI runs lint, test, and build using the documented Make targets, and the
+same validation gate is exposed locally as `make ci`.
 
 Why:
 
@@ -88,6 +100,8 @@ Why:
 - local, CI, and Docker paths stay close together
 - review and handoff workflows are easier to follow
 - tooling remains proportionate to project size
+- repo-local AI workflows can be documented without changing the
+  product's runtime model
 
 ### Trade-offs
 

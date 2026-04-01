@@ -11,13 +11,17 @@ make backend.run
 
 The server listens on `http://localhost:8080`.
 
+If you use `asdf`, the repository includes a root `.tool-versions` file
+with the recommended Go and Node.js versions for local development.
+
 ## Structure
 
 ```text
 backend/
   cmd/server/              entry point, env config, graceful shutdown
   internal/calculator/     calculation domain logic
-  internal/handler/        HTTP transport, request validation, JSON responses
+  internal/handler/        HTTP transport, request validation, JSON responses,
+                           and a small service interface for handler-layer mocks
   Dockerfile               multi-stage build
   .golangci.yml            Go lint configuration
 ```
@@ -124,6 +128,7 @@ contract.
 | `make backend.lint` | Run `golangci-lint` (use `FIX=1` to auto-fix) |
 | `make backend.format` | Format Go source files (`go fmt`) |
 | `make backend.build` | Build `backend/bin/server` |
+| `make ci` | Run the root validation gate (`lint`, `test`, and `build`) |
 | `make backend.clean` | Remove all backend build artifacts |
 | `make backend.clean.bin` | Remove only the backend binary (`backend/bin/`) |
 | `make backend.clean.coverage` | Remove only coverage files (`coverage.out`, `coverage.html`) |

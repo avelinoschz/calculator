@@ -28,9 +28,10 @@ fully functional and includes:
 - consistent JSON error responses with typed error codes
 - multi-stage Dockerfiles and Docker Compose
 - Makefile workflows for setup, run, test, coverage, lint, format,
-  build, and Docker tasks
+  build, `ci`, and Docker tasks
 - GitHub Actions CI for lint, test, and build
-- supporting ADRs and AI-usage documentation
+- supporting ADRs, AI-usage documentation, and repo-local AI workflow
+  artifacts under `.agents/`
 
 The purpose of this plan was to keep the work:
 
@@ -185,6 +186,7 @@ Make the project easy to run, test, lint, build, and evaluate.
 - `make lint`
 - `make format`
 - `make build`
+- `make ci`
 - `make docker.build`
 - `make up`
 - `make down`

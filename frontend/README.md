@@ -11,6 +11,9 @@ make frontend.run
 
 The Vite dev server runs on `http://localhost:5173` and proxies `/api/*` to `http://localhost:8080`.
 
+If you use `asdf`, the repository includes a root `.tool-versions` file
+with the recommended Go and Node.js versions for local development.
+
 ## Structure
 
 ```text
@@ -70,6 +73,7 @@ Supported operations:
 | `make frontend.lint` | Run ESLint (use `FIX=1` to auto-fix) |
 | `make frontend.format` | Format frontend source files (Prettier) |
 | `make frontend.build` | Build `frontend/dist/` |
+| `make ci` | Run the root validation gate (`lint`, `test`, and `build`) |
 | `make frontend.clean` | Remove all frontend build artifacts |
 | `make frontend.clean.dist` | Remove only the build output (`frontend/dist/`) |
 | `make frontend.clean.coverage` | Remove only the coverage report (`frontend/coverage/`) |

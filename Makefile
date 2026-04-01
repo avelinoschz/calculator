@@ -18,6 +18,7 @@ export VERSION
 	backend.lint frontend.lint docs.lint lint \
 	backend.format frontend.format format \
 	backend.build frontend.build build \
+	ci \
 	backend.clean.bin backend.clean.coverage backend.clean \
 	frontend.clean.dist frontend.clean.coverage frontend.clean \
 	clean.bin clean \
@@ -109,6 +110,8 @@ frontend.build: ## Build frontend static assets → frontend/dist/
 	cd frontend && npm run build
 
 build: backend.build frontend.build ## Build backend binary and frontend assets
+
+ci: lint test build ## Run the full validation gate used for completion and CI
 
 # ── Docker ────────────────────────────────────────────────────────────────────
 

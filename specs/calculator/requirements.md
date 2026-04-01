@@ -137,14 +137,19 @@ engineering practices.
 ### Docs tooling
 
 - Linting: `markdownlint` (configured via `.markdownlint.json`)
+- AI workflow artifacts: concise repo-local skills and sub-agent
+  definitions when they materially support the development workflow
 
 ## Developer Experience Requirements
 
 - Provide a `Makefile` with common development commands
 - Support both local development and Docker-based development flows
 - Keep developer commands simple and discoverable
-- Provide targets for: setup, run, test, lint, format, build,
+- Provide targets for: setup, run, test, lint, format, build, `ci`,
   and Docker-based workflows
+- Pin the recommended local tool versions in `.tool-versions`
+- Keep repo-local AI collaboration artifacts small and explicit under
+  `.agents/` when they are added
 
 ## Containerization
 
@@ -189,7 +194,6 @@ core scope is complete:
   - OpenTelemetry tracing
   - Jaeger integration
 - Additional Make targets such as:
-  - `make ci`
   - `make clean`
 
 ## Out of Scope
