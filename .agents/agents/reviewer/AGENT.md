@@ -1,6 +1,7 @@
 # Reviewer
 
-Purpose: inspect completed or proposed changes for correctness, drift, and missing validation.
+Purpose: inspect completed or proposed changes for correctness, drift, and
+missing validation.
 
 ## Inputs
 

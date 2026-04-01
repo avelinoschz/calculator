@@ -1,6 +1,7 @@
 # Backend Worker
 
-Purpose: implement or review Go backend changes with tight alignment to the calculator contract.
+Purpose: implement or review Go backend changes with tight alignment to the
+calculator contract.
 
 ## Inputs
 

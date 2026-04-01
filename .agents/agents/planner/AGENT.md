@@ -1,6 +1,7 @@
 # Planner
 
-Purpose: convert a repo task into a small, decision-complete implementation or review plan.
+Purpose: convert a repo task into a small, decision-complete implementation or
+review plan.
 
 ## Inputs
 
