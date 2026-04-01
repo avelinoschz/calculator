@@ -324,49 +324,57 @@ func TestCalculateHandlerUsesInjectedService(t *testing.T) {
 	assert.InDelta(t, 5.0, *svc.calledB, 1e-9)
 }
 
-func TestCalculateHandlerMapsInjectedServiceErrors(t *testing.T) {
+func TestCalculateHandlerMapsServiceErrors(t *testing.T) {
 	t.Parallel()
 
-	svc := &mockCalculatorService{
-		err: calculator.ErrDivisionByZero,
+	tests := []struct {
+		name          string
+		body          string
+		svcErr        error
+		wantStatus    int
+		wantErrorCode string
+		wantMessage   string
+	}{
+		{
+			name:          "typed domain error maps to correct status and code",
+			body:          `{"op":"divide","a":10,"b":0}`,
+			svcErr:        calculator.ErrDivisionByZero,
+			wantStatus:    http.StatusUnprocessableEntity,
+			wantErrorCode: calculator.ErrDivisionByZero.Code(),
+			wantMessage:   calculator.ErrDivisionByZero.Error(),
+		},
+		{
+			name:          "unrecognized error maps to internal error",
+			body:          `{"op":"sqrt","a":9}`,
+			svcErr:        assert.AnError,
+			wantStatus:    http.StatusInternalServerError,
+			wantErrorCode: handler.ErrCodeInternalError,
+		},
 	}
-	h := handler.New(svc)
 
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculations", bytes.NewBufferString(`{"op":"divide","a":10,"b":0}`))
-	req.Header.Set("Content-Type", "application/json")
-	rec := httptest.NewRecorder()
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	h.Calculate(rec, req)
+			svc := &mockCalculatorService{err: tc.svcErr}
+			h := handler.New(svc)
 
-	assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+			req := httptest.NewRequest(http.MethodPost, "/api/v1/calculations", bytes.NewBufferString(tc.body))
+			req.Header.Set("Content-Type", "application/json")
+			rec := httptest.NewRecorder()
 
-	var resp handler.ErrorResponse
-	require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
-	assert.Equal(t, calculator.ErrDivisionByZero.Code(), resp.Error.Code)
-	assert.Equal(t, calculator.ErrDivisionByZero.Error(), resp.Error.Message)
+			h.Calculate(rec, req)
 
-	assert.Equal(t, calculator.OperationDivide, svc.calledOp)
-}
+			assert.Equal(t, tc.wantStatus, rec.Code)
 
-func TestCalculateHandlerReturnsInternalErrorForUnexpectedServiceFailure(t *testing.T) {
-	t.Parallel()
-
-	svc := &mockCalculatorService{
-		err: assert.AnError,
+			var resp handler.ErrorResponse
+			require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
+			assert.Equal(t, tc.wantErrorCode, resp.Error.Code)
+			if tc.wantMessage != "" {
+				assert.Equal(t, tc.wantMessage, resp.Error.Message)
+			}
+		})
 	}
-	h := handler.New(svc)
-
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculations", bytes.NewBufferString(`{"op":"sqrt","a":9}`))
-	req.Header.Set("Content-Type", "application/json")
-	rec := httptest.NewRecorder()
-
-	h.Calculate(rec, req)
-
-	assert.Equal(t, http.StatusInternalServerError, rec.Code)
-
-	var resp handler.ErrorResponse
-	require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
-	assert.Equal(t, handler.ErrCodeInternalError, resp.Error.Code)
 }
 
 func ptr(f float64) *float64 { return &f }
