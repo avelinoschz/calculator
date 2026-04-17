@@ -95,14 +95,58 @@ Adding a new domain error requires:
 
 No handler branching logic needs to change.
 
-### 3. Sentinel identity preserved
+### 3. Sentinel identity and code-based matching
 
 The errors remain package-level variables — typed sentinels, not opaque
-ones. `errors.Is(err, calculator.ErrDivisionByZero)` continues to work by
-pointer identity exactly as before. Existing test code and any caller
-relying on `errors.Is` requires no change. What changed is that the errors
-now also expose structure via `errors.As`, enabling generic extraction of
-`Code()` and `Error()` without per-error branching.
+ones. `errors.Is` continues to work for all domain errors via the `Is`
+method on `*Error`, which compares by `code` string:
+
+```go
+func (e *Error) Is(target error) bool {
+    t, ok := target.(*Error)
+    if !ok {
+        return false
+    }
+    return e.code == t.code
+}
+```
+
+For most sentinels (`ErrDivisionByZero`, `ErrNegativeSquareRoot`, etc.) the
+domain function returns the sentinel directly, so pointer identity and code
+comparison produce the same result.
+
+`ErrOperandOutOfRange` is a special case. Its `message` field is a format
+template rather than a final string:
+
+```go
+ErrOperandOutOfRange = &Error{
+    code:    "OPERAND_OUT_OF_RANGE",
+    message: "operands must be between %g and %g",
+}
+```
+
+`Service.Calculate` never returns the sentinel itself. It always returns a
+dynamically constructed instance via `newErrOperandOutOfRange(min, max)`,
+which formats the message with the configured limits so the caller sees
+`"operands must be between -100 and 100"` rather than a static fallback.
+The sentinel is used only as the `errors.Is` comparison target.
+
+`newErrOperandOutOfRange` keeps the sentinel as the single source of truth
+for both `code` and message template:
+
+```go
+func newErrOperandOutOfRange(min, max float64) *Error {
+    return &Error{
+        code:    ErrOperandOutOfRange.code,
+        message: fmt.Sprintf(ErrOperandOutOfRange.message, min, max),
+    }
+}
+```
+
+Existing test code and any caller relying on `errors.Is` requires no change.
+What changed is that the errors also expose structure via `errors.As`,
+enabling generic extraction of `Code()` and `Error()` without per-error
+branching.
 
 ### 4. Message ownership is explicit
 
@@ -138,3 +182,8 @@ errors.
   is slightly more aware of how it is consumed.
 - `errors.As` is less widely known than `errors.Is`. The pattern requires
   familiarity with Go's error wrapping model.
+- The `Is` method means any two `*Error` values with the same `code` are
+  equivalent under `errors.Is`. Pointer uniqueness of sentinels is no
+  longer relied upon. This is intentional — it is what allows dynamically
+  constructed errors (such as those returned by `newErrOperandOutOfRange`)
+  to match their corresponding sentinel.
